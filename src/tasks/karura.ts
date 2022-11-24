@@ -179,13 +179,14 @@ export const runKaruraTask = async () => {
 
 
             collections.farms?.findOneAndUpdate({
-                "id": ip.id,
+                "id": 1,
                 "chef": "incentives-dex-dexshare",
                 "chain": "Karura",
                 "protocol": "Karura DEX",
+                "asset.address": ip.id
             }, {
                 "$set": {
-                    "id": ip.id,
+                    "id": 1,
                     "chef": "incentives-dex-dexshare",
                     "chain": "Karura",
                     "protocol": "Karura DEX",
