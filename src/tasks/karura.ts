@@ -67,6 +67,9 @@ export const runKaruraTask = async () => {
             // console.log("apr", ip.apr?.apr);
             const pd = await liq.getPoolDetail(ip.collateral.name)
             // console.log("tvl", pd.tvl.toNumber());
+            const totalStaked = (pd?.sharePrice?.toNumber() ?? 0.0) * (ip?.totalShares?.toNumber() ?? 0.0);
+            // console.log("pd shareprice", pd.sharePrice, "ip totalshares", ip.totalShares, "prod", pd.sharePrice.toNumber() * ip.totalShares.toNumber());
+
 
             // console.log("rewards:");
             // console.log("rtconfigs", ip.rewardTokensConfig, ip.savingRate);
@@ -153,7 +156,7 @@ export const runKaruraTask = async () => {
                     "reward": (ip.apr?.apr ?? 0.0) * 100.0,
                     "base": baseAPR,
                 },
-                "tvl": pd?.tvl?.toNumber(),
+                "tvl": totalStaked,
                 "rewards": rewards
             })
             console.log(`pool ${ip.id}`, {
@@ -167,7 +170,7 @@ export const runKaruraTask = async () => {
                     "reward": (ip.apr?.apr ?? 0.0) * 100.0,
                     "base": baseAPR,
                 },
-                "tvl": pd?.tvl?.toNumber(),
+                "tvl": totalStaked,
                 "rewards": rewards
             });
 
@@ -197,7 +200,7 @@ export const runKaruraTask = async () => {
                             `https://raw.githubusercontent.com/yield-bay/assets/main/list/${token1}.png`,
                         ],
                     },
-                    "tvl": pd?.tvl?.toNumber(),
+                    "tvl": totalStaked,
                     "apr.reward": (ip.apr?.apr ?? 0.0) * 100.0,
                     "apr.base": baseAPR,
                     "rewards": rewards,
