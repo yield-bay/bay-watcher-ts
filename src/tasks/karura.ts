@@ -1,12 +1,24 @@
 import { ApiPromise, ApiRx } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider';
 import { options } from '@acala-network/api';
-import { Wallet, Incentive, Liquidity } from "@acala-network/sdk";
-import { getAPR } from "@acala-network/sdk/incentive/utils/get-apr";
-import { AnyApi } from "@acala-network/sdk-core";
-import axios from "axios";
+import { Wallet, Incentive, Liquidity } from '@acala-network/sdk';
+import axios from 'axios';
 
 import { collections } from '../services/database.service';
+import { FixedPointNumber } from '@acala-network/sdk-core';
+
+export const MILLISECONDS_OF_DAY = 24 * 60 * 60 * 1000;
+
+export const SECONDS_OF_DAY = 24 * 60 * 60;
+
+export const MILLISECONDS_OF_YEAR = 365 * MILLISECONDS_OF_DAY;
+
+export const SECONDS_OF_YEAR = 365 * SECONDS_OF_DAY;
+
+export const EXPECTED_BLOCK_TIME = 12 * 1000;
+
+export const EXPECTED_BLOCK_TIME_WITH_DELAY = 12.5 * 1000;
+
 
 export const runKaruraTask = async () => {
     const provider: any = new WsProvider('wss://karura-rpc-0.aca-api.network');
@@ -18,6 +30,8 @@ export const runKaruraTask = async () => {
     let ict = new Incentive(api, wallet)
     let liq = new Liquidity(api, wallet)
     let ips = await ict.getAllIncentivePools()
+
+    const periodCount = MILLISECONDS_OF_DAY / EXPECTED_BLOCK_TIME / ict.consts.accumulatePeriod;
 
     const res = await axios.post("https://api.polkawallet.io/karura-dex-subql", {
         query: `
@@ -61,19 +75,19 @@ export const runKaruraTask = async () => {
             // })
 
             const rewards: { amount: number; asset: string; valueUSD: number; freq: string; }[] = []
-            ip.rewards.forEach(reward => {
+            ip.rewardTokensConfig.forEach(reward => {
                 let priceUSD = 1.0;
-                if (reward.rewardToken.display == "KAR")
+                if (reward.token.display == "KAR")
                     priceUSD = karPrice;
-                else if (reward.rewardToken.display == "aUSD")
+                else if (reward.token.display == "aUSD")
                     priceUSD = 1.0;
+                console.log("rtoken", reward.token.display);
 
-                if (reward.rewardToken.display == "KAR" || reward.rewardToken.display == "aUSD") {
-                    // TODO: Fix reward frequency
+                if (reward.token.display == "KAR" || reward.token.display == "aUSD") {
                     rewards.push({
-                        "amount": reward.totalReward.toNumber(),
-                        "asset": reward.rewardToken.display,
-                        "valueUSD": reward.totalReward.toNumber() * priceUSD,
+                        "amount": reward.amount.toNumber() * periodCount,
+                        "asset": reward.token.display,
+                        "valueUSD": reward.amount.toNumber() * priceUSD * periodCount,
                         "freq": "Daily",
                     })
                 }
@@ -165,13 +179,13 @@ export const runKaruraTask = async () => {
                 "id": ip.id,
                 "chef": "incentives-dex-dexshare",
                 "chain": "Karura",
-                "protocol": "Incentives",
+                "protocol": "Karura DEX",
             }, {
                 "$set": {
                     "id": ip.id,
                     "chef": "incentives-dex-dexshare",
                     "chain": "Karura",
-                    "protocol": "Incentives",
+                    "protocol": "Karura DEX",
                     "farmType": "StandardAmm",
                     "farmImpl": "Pallet",
                     "asset": {

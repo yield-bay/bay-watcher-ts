@@ -22,6 +22,16 @@
     "@open-web3/orml-types" "^1.1.4"
     "@polkadot/api-derive" "^8.5.1"
 
+"@acala-network/api-derive@4.1.8-1":
+  version "4.1.8-1"
+  resolved "https://registry.yarnpkg.com/@acala-network/api-derive/-/api-derive-4.1.8-1.tgz#33d9c05eaa04c42364c819eaa0ddb7c931da3b12"
+  integrity sha512-AFTPIiuIoXbB9rMuiwbO9BYelGMM4byJJcOSWiRK2Nz/AqkDJkb4zDfsWOcwnicbffXlTbKkJ/hBxdzqNq0dig==
+  dependencies:
+    "@acala-network/types" "4.1.8-1"
+    "@babel/runtime" "^7.10.2"
+    "@open-web3/orml-types" "^1.1.4"
+    "@polkadot/api-derive" "^8.5.1"
+
 "@acala-network/api@4.1.4-3":
   version "4.1.4-3"
   resolved "https://registry.yarnpkg.com/@acala-network/api/-/api-4.1.4-3.tgz#4d581fe2a627af36e6cccc22b2cb61264a6eaacc"
@@ -34,7 +44,7 @@
     "@polkadot/api" "^8.5.1"
     "@polkadot/rpc-core" "^8.5.1"
 
-"@acala-network/api@4.1.5", "@acala-network/api@^4.1.5":
+"@acala-network/api@4.1.5":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@acala-network/api/-/api-4.1.5.tgz#3e6f39704744b15f7bd61856d4fa53e7944fc7d5"
   integrity sha512-Q/BpCvP6K62F95R1finMNPaiw3OS4QKtt4m0SAoITf1XYSsW18oYCaG7AlkfbyRM5JQboVMUswWiTJJ2XpRM3g==
@@ -45,6 +55,18 @@
     "@open-web3/orml-api-derive" "^1.1.4"
     "@polkadot/api" "^8.5.1"
     "@polkadot/rpc-core" "^8.5.1"
+
+"@acala-network/api@^4.1.8-2.1":
+  version "4.1.8-2.1"
+  resolved "https://registry.yarnpkg.com/@acala-network/api/-/api-4.1.8-2.1.tgz#7201e490e20ba6e4908574ea9f375539e2882dbe"
+  integrity sha512-bDzX5trMiaZIAqX0bJxZbALbQ2GW1W5N70Alk3Lpj7WEj+Fl32qIWVRqagj3QGbjdPdq92/De2W1ShVGLv7Rng==
+  dependencies:
+    "@acala-network/api-derive" "4.1.8-1"
+    "@acala-network/types" "4.1.8-2"
+    "@babel/runtime" "^7.10.2"
+    "@open-web3/orml-api-derive" "^1.1.4"
+    "@polkadot/api" "^9.9.1"
+    "@polkadot/rpc-core" "^9.9.1"
 
 "@acala-network/bodhi@^2.4.0":
   version "2.5.3"
@@ -191,6 +213,13 @@
   dependencies:
     "@open-web3/orml-type-definitions" "^1.1.4"
 
+"@acala-network/type-definitions@4.1.8-1":
+  version "4.1.8-1"
+  resolved "https://registry.yarnpkg.com/@acala-network/type-definitions/-/type-definitions-4.1.8-1.tgz#48b57e9e0a63187f42dfd038881ebcc01a7dd1fd"
+  integrity sha512-dTqOcUNDAPbiC0z0ZkkizIgvIT8oCtlnoSaM+YSgnDzYW/qDadpy2SDQQXubbgkEb8OQpZffViXuxEQt04RmUg==
+  dependencies:
+    "@open-web3/orml-type-definitions" "^1.1.4"
+
 "@acala-network/types@4.1.4-3":
   version "4.1.4-3"
   resolved "https://registry.yarnpkg.com/@acala-network/types/-/types-4.1.4-3.tgz#b88f8ec14b9e6e17f879cec194d1a85f22deea59"
@@ -207,6 +236,26 @@
   integrity sha512-MTT0d+AFCMrm/ngNDoPJDAS8XSayFgLRUH9wT5Nvks/6n3WCzgNyGGZsgQI0PWGer/fdvAryJmNCX2xbKq4ghA==
   dependencies:
     "@acala-network/type-definitions" "4.1.5"
+    "@babel/runtime" "^7.10.2"
+    "@open-web3/api-mobx" "^1.1.4"
+    "@open-web3/orml-types" "^1.1.4"
+
+"@acala-network/types@4.1.8-1":
+  version "4.1.8-1"
+  resolved "https://registry.yarnpkg.com/@acala-network/types/-/types-4.1.8-1.tgz#619cdd0e8d4a8c12e24cee3e7df609209a9c6429"
+  integrity sha512-DQw7tpVniwb9PLx5yhMSgJHoKnyqOgU5CV2eZCZz3dloQK1B2wizXI39wGN3vkONj9gjU+WxVCTWIeZ2fYifLw==
+  dependencies:
+    "@acala-network/type-definitions" "4.1.8-1"
+    "@babel/runtime" "^7.10.2"
+    "@open-web3/api-mobx" "^1.1.4"
+    "@open-web3/orml-types" "^1.1.4"
+
+"@acala-network/types@4.1.8-2":
+  version "4.1.8-2"
+  resolved "https://registry.yarnpkg.com/@acala-network/types/-/types-4.1.8-2.tgz#9617f1e7e7b40ae67d84ef5061b114ef793b2e9d"
+  integrity sha512-0il0K/iRd5ewjwMG4OBszMg5paDRFNTqr8yIgOALLJy8JyvA25rcERTTEWqa4ZHB1ksJKRKHEY3scTNW60khUA==
+  dependencies:
+    "@acala-network/type-definitions" "4.1.8-1"
     "@babel/runtime" "^7.10.2"
     "@open-web3/api-mobx" "^1.1.4"
     "@open-web3/orml-types" "^1.1.4"
@@ -2057,7 +2106,7 @@
     "@polkadot/util" "^10.1.1"
     rxjs "^7.5.6"
 
-"@polkadot/rpc-core@9.9.1":
+"@polkadot/rpc-core@9.9.1", "@polkadot/rpc-core@^9.9.1":
   version "9.9.1"
   resolved "https://registry.yarnpkg.com/@polkadot/rpc-core/-/rpc-core-9.9.1.tgz#f66318fe54f66652287dab9c4d611b71863b266a"
   integrity sha512-ij1OxDfbPpdZ9+aN8oicZrysIfUjC7INBhDwwoZ4R/4jhqJvIV1fisgj6XOdHGlZGl+vQBnObOw0nEOU7apdQg==
