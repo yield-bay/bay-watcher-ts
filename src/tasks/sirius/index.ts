@@ -57,7 +57,7 @@ export const runSiriusTask = async () => {
                 }, {
                     upsert: true
                 }).then(r => {
-                    console.log("sirius-finance", pool.symbol);
+                    // console.log("sirius-finance", pool.symbol);
                 }).catch(e => {
                     console.log("error sirius-finance", e);
                 })

@@ -13,26 +13,26 @@ export const runArswTask = async () => {
     ];
 
     let res = await collections.assets?.findOne({ "protocol": "arthswap", "chain": "astar", "address": "0xDe2578Edec4669BA7F41c5d5D2386300bcEA4678", "price": { "$ne": 0 } })
-    console.log("res", res);
+    // console.log("res", res);
 
     let arswPrice = res?.price ?? 0;
 
     let stableArswStaking = new ethers.Contract("0x42d175a498Cb517Ad29d055ea7DcFD3D99045404", stableArswStakingAbi, provider);
     let internalArswBalance = await stableArswStaking.internalArswBalance();
-    console.log("internalArswBalance", internalArswBalance);
+    // console.log("internalArswBalance", internalArswBalance);
 
     let moneyMaker = new ethers.Contract("0x1e385b1BbED0FD2dfaA9108577BDe9b376038C45", moneyMakerAbi, provider);
     let remittedTokens7d = await moneyMaker.remittedTokens7d();
     let sum = 0;
     remittedTokens7d.forEach((t: any) => {
-        console.log("amt", t.amount, t.amount.toString());
+        // console.log("amt", t.amount, t.amount.toString());
         sum += parseFloat(t.amount.toString());
     });
     sum /= 7;
     let apr = (36500 * sum) / parseFloat(internalArswBalance.toString());
-    console.log("apr", apr);
+    // console.log("apr", apr);
     let tvl = parseFloat(internalArswBalance.toString()) * arswPrice / 10 ** 18;
-    console.log("tvl", tvl);
+    // console.log("tvl", tvl);
 
     collections.farms?.findOneAndUpdate({
         "id": 1,
@@ -72,7 +72,7 @@ export const runArswTask = async () => {
     }, {
         upsert: true
     }).then(r => {
-        console.log("arsw ");
+        // console.log("arsw ");
     }).catch(e => {
         console.log("error arsw ", e);
     })

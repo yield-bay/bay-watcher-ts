@@ -6,7 +6,7 @@ import * as dotenv from "dotenv"
 export const collections: {
   assets?: mongoDB.Collection
   farms?: mongoDB.Collection
-
+  users?: mongoDB.Collection
 } = {}
 
 // Initialize Connection
@@ -20,13 +20,15 @@ export async function connectToDatabase() {
   await client.connect()
 
   const db: mongoDB.Db = client.db(process.env.DB_NAME)
+  const leaderboardDb: mongoDB.Db = client.db(process.env.LEADERBOARD_DB_NAME)
 
   const assetsCollection: mongoDB.Collection = db.collection("assets")
   const farmsCollection: mongoDB.Collection = db.collection("farms")
-
+  const usersCollection: mongoDB.Collection = leaderboardDb.collection("User")
 
   collections.assets = assetsCollection
   collections.farms = farmsCollection
+  collections.users = usersCollection
 
   console.log(`Successfully connected to database: ${db.databaseName}`)
 }
