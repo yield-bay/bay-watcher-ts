@@ -173,7 +173,26 @@ export const runMangataTask = async () => {
     const MAINNET_2 = 'wss://prod-kusama-collator-01.mangatafinance.cloud'
     const mangata = Mangata.getInstance([MAINNET_1, MAINNET_2])
 
+    const api = await mangata.getApi()
+    console.log("Connected: ", api.isConnected)
+
+    // console.log("mgpools", await mangata.getPools());
+    // console.log("mglqts", await mangata.getLiquidityTokens());
+
+    const pprs: any = await api.query.issuance.promotedPoolsRewardsV2()
+    console.log("pprsv2", pprs);
+
     let assetsInfo = await mangata.getAssetsInfo()
+    console.log("assetsInfo", assetsInfo);
+
+    let weightSum = 0;
+    pprs.forEach((ppr: Map<string, number>, q: any) => {
+        weightSum += parseInt((ppr.get("weight") ?? "0").toString(), 10)
+    })
+
+    // let poolBalances = new Map<string, any>();
+    // let ps = new Map<string, any>();
+
     const balance40: any = await mangata.getAmountOfTokenIdInPool('4', '0')
     const balance07: any = await mangata.getAmountOfTokenIdInPool('0', '7')
     const balance011: any = await mangata.getAmountOfTokenIdInPool('0', '11')
@@ -261,9 +280,6 @@ export const runMangataTask = async () => {
     console.log("mgx-tur tvl: $", mgxTurTvl);
     const mgxImbuTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_11) / 10 ** mgxDecimals + (imbuInKsm * parseInt(bal1_0_11) / 10 ** imbuDecimals));
     console.log("mgx-imbu tvl: $", mgxImbuTvl);
-
-    const rewards_per_day = ksmInUsd * mgxInKsm * (300 * 10 ** 6 / (rwd_pools_count * 365))
-    console.log("rewards_per_day: $", rewards_per_day, "or ", (300 * 10 ** 6 / (rwd_pools_count * 365)), "mgx");
 
     // base_apr
 
@@ -524,138 +540,125 @@ export const runMangataTask = async () => {
         console.log("baseAPRMgxImbu", baseAPRMgxImbu);
     }
 
-    collections.farms?.findOneAndUpdate({
-        "id": 5,
-        "chef": "xyk",
-        "chain": "Mangata Kusama",
-        "protocol": "Mangata X",
-    }, {
-        "$set": {
-            "id": 5,
+
+    pprs.forEach(async (ppr: Map<string, number>, q: any) => {
+        console.log("ppr", ppr.get("weight")?.toString(), "q", q?.toString());
+        const weight = parseInt((ppr.get("weight") ?? "0").toString(), 10)
+
+        let y = await mangata.getLiquidityPool(q?.toString())
+        console.log("farm id:", q?.toString(), "underlying pool:", y);
+
+        const token0 = y[0].toString()
+        const token1 = y[1].toString()
+
+        const balance: any[] = await mangata.getAmountOfTokenIdInPool(token0, token1)
+
+        const symbol0 = assetsInfo[token0]['symbol'];
+        const symbol1 = assetsInfo[token1]['symbol'];
+        let liq = 1;
+        if (symbol0 == "MGX" || symbol1 == "MGX") {
+            let mgxIdx = 0;
+            let mgxBal = 0;
+
+            if (token0 == "0") {
+                mgxIdx = 0
+                mgxBal = balance[mgxIdx] / 10 ** assetsInfo["0"]["decimals"]
+
+            } else if (token1 == "0") {
+                mgxIdx = 1;
+                mgxBal = balance[mgxIdx] / 10 ** assetsInfo["0"]["decimals"]
+            }
+
+            liq = mgxBal * 2;
+        } else if (symbol0 == "KSM" || symbol1 == "KSM") {
+            let ksmIdx = 0;
+            let ksmBal = 0;
+
+            if (token0 == "4") {
+                ksmIdx = 0
+                ksmBal = balance[ksmIdx] / 10 ** assetsInfo["4"]["decimals"]
+            } else if (token1 == "4") {
+                ksmIdx = 1;
+                ksmBal = balance[ksmIdx] / 10 ** assetsInfo["4"]["decimals"]
+            }
+
+            liq = (ksmBal / mgxInKsm) * 2;
+        }
+
+        const apr = 100 * ((300 * 10 ** 6) * weight / weightSum) / (liq)
+
+        const bal0 = balance.toString().split(",")[0]
+        const bal1 = balance.toString().split(",")[1]
+
+        let baseApr = 0;
+        let tvl = 0;
+
+        if (q?.toString() == "5") {
+            tvl = ksmMgxTvl;
+            baseApr = baseAPRKsmMgx;
+        } else if (q?.toString() == "8") {
+            tvl = mgxTurTvl;
+            baseApr = baseAPRMgxTur;
+        } else if (q?.toString() == "12") {
+            tvl = mgxImbuTvl;
+            baseApr = baseAPRMgxImbu;
+        }
+
+        // ps.set(q?.toString(), {
+        //     "token0": token0,
+        //     "token1": token1,
+        //     "symbol0": symbol0,
+        //     "symbol1": symbol1,
+        //     "balance": balance,
+        //     "bal0": bal0,
+        //     "bal1": bal1,
+        //     "decimals": assetsInfo[q?.toString()]['decimals'],
+        //     "apr": apr,
+        //     "rewards_per_day": ksmInUsd * mgxInKsm * (((300 * 10 ** 6) * (weight / weightSum)) / 365)
+        // })
+
+        collections.farms?.findOneAndUpdate({
+            "id": parseInt(q?.toString(), 10),
             "chef": "xyk",
             "chain": "Mangata Kusama",
             "protocol": "Mangata X",
-            "farmType": "StandardAmm",
-            "farmImpl": "Pallet",
-            "asset": {
-                "symbol": "KSM-MGX LP",
-                "address": "KSM-MGX LP",
-                "price": 0.0,
-                "logos": [
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/KSM.png",
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/MGX.png",
+        }, {
+            "$set": {
+                "id": parseInt(q?.toString(), 10),
+                "chef": "xyk",
+                "chain": "Mangata Kusama",
+                "protocol": "Mangata X",
+                "farmType": "StandardAmm",
+                "farmImpl": "Pallet",
+                "asset": {
+                    "symbol": `${symbol0}-${symbol1} LP`,
+                    "address": `${symbol0}-${symbol1} LP`,
+                    "price": 0.0,
+                    "logos": [
+                        `https://raw.githubusercontent.com/yield-bay/assets/main/list/${symbol0}.png`,
+                        `https://raw.githubusercontent.com/yield-bay/assets/main/list/${symbol1}.png`,
+                    ],
+                },
+                "tvl": tvl,
+                "apr.reward": apr,
+                "apr.base": baseApr,
+                "rewards": [
+                    {
+                        "amount": (((300 * 10 ** 6) * (weight / weightSum)) / 365),
+                        "asset": "MGX",
+                        "valueUSD": ksmInUsd * mgxInKsm * (((300 * 10 ** 6) * (weight / weightSum)) / 365),
+                        "freq": "Daily",
+                    }
                 ],
-            },
-            "tvl": ksmMgxTvl,
-            "apr.reward": ksm_mgx_apr,
-            "apr.base": baseAPRKsmMgx,
-            "rewards": [
-                {
-                    "amount": (300 * 10 ** 6 / (rwd_pools_count * 365)),
-                    "asset": "MGX",
-                    "valueUSD": rewards_per_day,
-                    "freq": "Daily",
-                }
-            ],
-            "allocPoint": 1,
-            "lastUpdatedAtUTC": new Date().toUTCString(),
-        }
-    }, {
-        upsert: true
-    }).then(r => {
-        console.log("xyk 5");
-    }).catch(e => {
-        console.log("error xyk 5", e);
-
-    })
-
-    collections.farms?.findOneAndUpdate({
-        "id": 8,
-        "chef": "xyk",
-        "chain": "Mangata Kusama",
-        "protocol": "Mangata X",
-    }, {
-        "$set": {
-            "id": 8,
-            "chef": "xyk",
-            "chain": "Mangata Kusama",
-            "protocol": "Mangata X",
-            "farmType": "StandardAmm",
-            "farmImpl": "Pallet",
-            "asset": {
-                "symbol": "MGX-TUR LP",
-                "address": "MGX-TUR LP",
-                "price": 0.0,
-                "logos": [
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/MGX.png",
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/TUR.png",
-                ],
-            },
-            "tvl": mgxTurTvl,
-            "apr.reward": mgx_tur_apr,
-            "apr.base": baseAPRMgxTur,
-            "rewards": [
-                {
-                    "amount": (300 * 10 ** 6 / (rwd_pools_count * 365)),
-                    "asset": "MGX",
-                    "valueUSD": rewards_per_day,
-                    "freq": "Daily",
-                }
-            ],
-            "allocPoint": 1,
-            "lastUpdatedAtUTC": new Date().toUTCString(),
-        }
-    }, {
-        upsert: true
-    }).then(r => {
-        console.log("xyk 8");
-    }).catch(e => {
-        console.log("error xyk 8", e);
-
-    })
-
-    collections.farms?.findOneAndUpdate({
-        "id": 12,
-        "chef": "xyk",
-        "chain": "Mangata Kusama",
-        "protocol": "Mangata X",
-    }, {
-        "$set": {
-            "id": 12,
-            "chef": "xyk",
-            "chain": "Mangata Kusama",
-            "protocol": "Mangata X",
-            "farmType": "StandardAmm",
-            "farmImpl": "Pallet",
-            "asset": {
-                "symbol": "MGX-IMBU LP",
-                "address": "MGX-IMBU LP",
-                "price": 0.0,
-                "logos": [
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/MGX.png",
-                    "https://raw.githubusercontent.com/yield-bay/assets/main/list/IMBU.png",
-                ],
-            },
-            "tvl": mgxImbuTvl,
-            "apr.reward": mgx_imbu_apr,
-            "apr.base": baseAPRMgxImbu,
-            "rewards": [
-                {
-                    "amount": (300 * 10 ** 6 / (rwd_pools_count * 365)),
-                    "asset": "MGX",
-                    "valueUSD": rewards_per_day,
-                    "freq": "Daily",
-                }
-            ],
-            "allocPoint": 1,
-            "lastUpdatedAtUTC": new Date().toUTCString(),
-        }
-    }, {
-        upsert: true
-    }).then(r => {
-        console.log("xyk 12");
-    }).catch(e => {
-        console.log("error xyk 12", e);
-
-    })
+                "allocPoint": 1,
+                "lastUpdatedAtUTC": new Date().toUTCString(),
+            }
+        }, {
+            upsert: true
+        }).then(r => {
+            console.log("xyk");
+        }).catch(e => {
+            console.log("error xyk", e);
+        })
+    });
 }
