@@ -13,11 +13,11 @@ export const runNftTask = async () => {
     ]
 
     const privateKey = process.env.PRIVATE_KEY ?? "0x0";
-    const provider = new ethers.providers.JsonRpcProvider(process.env.MOONBASE_URL);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.MOONBEAM_URL);
     const wallet = new ethers.Wallet(privateKey, provider);
 
-    let moonbase_baynft = "0xa0e9c4b9B16DCf92623ba59Ada7b9b01cf1d86B5";
-    let baynft: any = new ethers.Contract(moonbase_baynft, abi, wallet as unknown as Signer);
+    let moonbeam_baynft = "0x546f3282A46E70A30e6Fa001Aed13E68669BC29D";
+    let baynft: any = new ethers.Contract(moonbeam_baynft, abi, wallet as unknown as Signer);
 
     let ucres: any[] = await collections.users?.find({
         "users_brought": { "$gt": 5 },
