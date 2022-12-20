@@ -196,7 +196,7 @@ export const runMangataTask = async () => {
     const balance40: any = await mangata.getAmountOfTokenIdInPool('4', '0')
     const balance07: any = await mangata.getAmountOfTokenIdInPool('0', '7')
     const balance011: any = await mangata.getAmountOfTokenIdInPool('0', '11')
-    console.log(`\nbal(0, 7): ${balance07}\nbal(4, 0): ${balance40}\nbal(0, 11): ${balance011}`);
+    // console.log(`\nbal(0, 7): ${balance07}\nbal(4, 0): ${balance40}\nbal(0, 11): ${balance011}`);
 
     let rwd_pools_count = 3
 
@@ -205,19 +205,19 @@ export const runMangataTask = async () => {
     let turDecimals: number = assetsInfo[7]['decimals']
     let imbuDecimals: number = assetsInfo[11]['decimals']
 
-    console.log("mgxDecimals", mgxDecimals, "turDecimals", turDecimals, "ksmDecimals", ksmDecimals, "imbuDecimals", imbuDecimals);
+    // console.log("mgxDecimals", mgxDecimals, "turDecimals", turDecimals, "ksmDecimals", ksmDecimals, "imbuDecimals", imbuDecimals);
 
     let mgxBal4_0: number = balance40[1] / 10 ** mgxDecimals // ksm_mgx
     let mgxBal0_7: number = balance07[0] / 10 ** mgxDecimals // mgx_tur
     let mgxBal0_11: number = balance011[0] / 10 ** mgxDecimals // mgx_imbu
 
-    console.log("mgxBal4_0", mgxBal4_0, "mgxBal0_7", mgxBal0_7, "mgxBal0_11", mgxBal0_11);
+    // console.log("mgxBal4_0", mgxBal4_0, "mgxBal0_7", mgxBal0_7, "mgxBal0_11", mgxBal0_11);
 
     let ksm_mgx_apr = 100 * (300 * 10 ** 6 / rwd_pools_count) / (mgxBal4_0 * 2)
     let mgx_tur_apr = 100 * (300 * 10 ** 6 / rwd_pools_count) / (mgxBal0_7 * 2)
     let mgx_imbu_apr = 100 * (300 * 10 ** 6 / rwd_pools_count) / (mgxBal0_11 * 2)
 
-    console.log("ksm_mgx_apr", ksm_mgx_apr, "mgx_tur_apr", mgx_tur_apr, "mgx_imbu_apr", mgx_imbu_apr);
+    // console.log("ksm_mgx_apr", ksm_mgx_apr, "mgx_tur_apr", mgx_tur_apr, "mgx_imbu_apr", mgx_imbu_apr);
 
     let bal0_4_0 = balance40.toString().split(",")[0]
     let bal1_4_0 = balance40.toString().split(",")[1]
@@ -258,7 +258,7 @@ export const runMangataTask = async () => {
         new BN((10 ** imbuDecimals).toString())
     );
 
-    console.log("mgxBuyPriceInKsm", mgxBuyPriceInKsm, "turBuyPriceInMgx", turBuyPriceInMgx, "imbuBuyPriceInMgx", imbuBuyPriceInMgx);
+    // console.log("mgxBuyPriceInKsm", mgxBuyPriceInKsm, "turBuyPriceInMgx", turBuyPriceInMgx, "imbuBuyPriceInMgx", imbuBuyPriceInMgx);
 
     const mgxInKsm = mgxBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
@@ -268,18 +268,18 @@ export const runMangataTask = async () => {
     const imbuInMgx = imbuBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
     const imbuInKsm = imbuInMgx * mgxInKsm;
 
-    console.log(mgxInKsm, turInKsm, turInMgx, imbuInMgx);
+    // console.log(mgxInKsm, turInKsm, turInMgx, imbuInMgx);
 
     let cgkres = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kusama&vs_currencies=usd")
     const ksmInUsd = cgkres?.data?.kusama?.usd ?? 0;
-    console.log("ksmInUsd", ksmInUsd);
+    // console.log("ksmInUsd", ksmInUsd);
 
     const ksmMgxTvl = ksmInUsd * (parseInt(bal0_4_0) / 10 ** ksmDecimals + (mgxInKsm * parseInt(bal1_4_0) / 10 ** mgxDecimals));
-    console.log("ksm-mgx tvl: $", ksmMgxTvl);
+    // console.log("ksm-mgx tvl: $", ksmMgxTvl);
     const mgxTurTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_7) / 10 ** mgxDecimals + (turInKsm * parseInt(bal1_0_7) / 10 ** turDecimals));
-    console.log("mgx-tur tvl: $", mgxTurTvl);
+    // console.log("mgx-tur tvl: $", mgxTurTvl);
     const mgxImbuTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_11) / 10 ** mgxDecimals + (imbuInKsm * parseInt(bal1_0_11) / 10 ** imbuDecimals));
-    console.log("mgx-imbu tvl: $", mgxImbuTvl);
+    // console.log("mgx-imbu tvl: $", mgxImbuTvl);
 
     // base_apr
 
@@ -288,7 +288,7 @@ export const runMangataTask = async () => {
     let baseAPRMgxImbu = 0;
 
     const getDecimals = (assetId: number, assetsInfo: TMainTokens) => {
-        console.log("assetsInfo", assetsInfo[assetId.toString()].decimals, "assetId", assetId);
+        // console.log("assetsInfo", assetsInfo[assetId.toString()].decimals, "assetId", assetId);
 
         return assetsInfo[assetId.toString()].decimals
     }
@@ -317,7 +317,7 @@ export const runMangataTask = async () => {
 
     d = JSON.parse(JSON.stringify(res.data))
 
-    console.log("blocknum", d?.data?.block_num ?? -1);
+    // console.log("blocknum", d?.data?.block_num ?? -1);
     blockNow = d?.data?.block_num ?? -1;
 
     const res1 = await axios({
@@ -337,10 +337,10 @@ export const runMangataTask = async () => {
 
     d1 = JSON.parse(JSON.stringify(res1.data))
 
-    console.log("blocknum", d1?.data?.block_num ?? -1);
+    // console.log("blocknum", d1?.data?.block_num ?? -1);
     blockNowLastWeek = d1?.data?.block_num ?? -1;
 
-    console.log("blockNow", blockNow, "blockNowLastWeek", blockNowLastWeek);
+    // console.log("blockNow", blockNow, "blockNowLastWeek", blockNowLastWeek);
 
     if (blockNowLastWeek !== -1 && blockNow !== -1) {
         let events: any = [];
@@ -362,7 +362,7 @@ export const runMangataTask = async () => {
         d2 = JSON.parse(JSON.stringify(res2.data))
 
         let dc = d2?.data?.count;
-        console.log("dc", dc);
+        // console.log("dc", dc);
 
         events = events.concat(d2?.data?.events)
 
@@ -387,7 +387,7 @@ export const runMangataTask = async () => {
                 di = JSON.parse(JSON.stringify(resi.data))
 
                 let dci = di?.data?.count;
-                console.log("dci", dci);
+                // console.log("dci", dci);
 
                 events = events.concat(di?.data?.events)
             }
@@ -395,10 +395,10 @@ export const runMangataTask = async () => {
 
         let swaps: any[] = []
 
-        console.log("final events len", events.length);
+        // console.log("final events len", events.length);
 
         let myarr = await Promise.all(events.map(async (ev: Event) => {
-            console.log("ev.extrinsic_index", ev.extrinsic_index)
+            // console.log("ev.extrinsic_index", ev.extrinsic_index)
 
             const res = await axios({
                 method: 'post',
@@ -418,7 +418,7 @@ export const runMangataTask = async () => {
             let d3: ExtrinsicRoot;
 
             d3 = JSON.parse(JSON.stringify(res.data))
-            console.log("d1i", d3.data.extrinsic_index);
+            // console.log("d1i", d3.data.extrinsic_index);
 
             let soldAsset = -1;
             let soldAmount = "0";
@@ -428,16 +428,16 @@ export const runMangataTask = async () => {
             let boughtAmountUsd = 0;
 
             d3.data.params.forEach((p: Param) => {
-                console.log("param", p);
+                // console.log("param", p);
                 if (p.name == "sold_asset_id") {
                     soldAsset = p.value
                 } else if (p.name == "sold_asset_amount") {
-                    console.log("saa", p.value);
+                    // console.log("saa", p.value);
                     soldAmount = p.value;
                 } else if (p.name == "bought_asset_id") {
                     boughtAsset = p.value
                 } else if (p.name == "bought_asset_amount") {
-                    console.log("baa", p.value);
+                    // console.log("baa", p.value);
                     boughtAmount = p.value;
                 }
             })
@@ -496,7 +496,7 @@ export const runMangataTask = async () => {
         } else {
             swaps = myarr
         }
-        console.log("swapslen", swaps.length, swaps);
+        // console.log("swapslen", swaps.length, swaps);
 
         let dailyVolumeLWKsmMgx = 0
         let dailyVolumeLWMgxTur = 0
@@ -519,25 +519,25 @@ export const runMangataTask = async () => {
             }
         })
 
-        console.log("dailyVolumeLWKsmMgx", dailyVolumeLWKsmMgx);
-        console.log("dailyVolumeLWMgxTur", dailyVolumeLWMgxTur);
-        console.log("dailyVolumeLWMgxImbu", dailyVolumeLWMgxImbu);
+        // console.log("dailyVolumeLWKsmMgx", dailyVolumeLWKsmMgx);
+        // console.log("dailyVolumeLWMgxTur", dailyVolumeLWMgxTur);
+        // console.log("dailyVolumeLWMgxImbu", dailyVolumeLWMgxImbu);
 
         dailyVolumeLWKsmMgx /= 7
         dailyVolumeLWMgxTur /= 7
         dailyVolumeLWMgxImbu /= 7
 
-        console.log("dailyVolumeLWKsmMgx", dailyVolumeLWKsmMgx);
-        console.log("dailyVolumeLWMgxTur", dailyVolumeLWMgxTur);
-        console.log("dailyVolumeLWMgxImbu", dailyVolumeLWMgxImbu);
+        // console.log("dailyVolumeLWKsmMgx", dailyVolumeLWKsmMgx);
+        // console.log("dailyVolumeLWMgxTur", dailyVolumeLWMgxTur);
+        // console.log("dailyVolumeLWMgxImbu", dailyVolumeLWMgxImbu);
 
         baseAPRKsmMgx = (dailyVolumeLWKsmMgx * 0.002 * 365 * 100) / (ksmMgxTvl)
         baseAPRMgxTur = (dailyVolumeLWMgxTur * 0.002 * 365 * 100) / (mgxTurTvl)
         baseAPRMgxImbu = (dailyVolumeLWMgxImbu * 0.002 * 365 * 100) / (mgxImbuTvl)
 
-        console.log("baseAPRKsmMgx", baseAPRKsmMgx);
-        console.log("baseAPRMgxTur", baseAPRMgxTur);
-        console.log("baseAPRMgxImbu", baseAPRMgxImbu);
+        // console.log("baseAPRKsmMgx", baseAPRKsmMgx);
+        // console.log("baseAPRMgxTur", baseAPRMgxTur);
+        // console.log("baseAPRMgxImbu", baseAPRMgxImbu);
     }
 
 

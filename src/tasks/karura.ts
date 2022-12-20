@@ -21,6 +21,7 @@ export const EXPECTED_BLOCK_TIME_WITH_DELAY = 12.5 * 1000;
 
 
 export const runKaruraTask = async () => {
+    console.log("starting karura task");
     const provider: any = new WsProvider('wss://karura-rpc-0.aca-api.network');
     const api: any = new ApiPromise(options({ provider }));
     await api.isReady;
@@ -84,7 +85,7 @@ export const runKaruraTask = async () => {
                     priceUSD = karPrice;
                 else if (reward.token.display == "aUSD")
                     priceUSD = 1.0;
-                console.log("rtoken", reward.token.display);
+                // console.log("rtoken", reward.token.display);
 
                 if (reward.token.display == "KAR" || reward.token.display == "aUSD") {
                     rewards.push({
@@ -94,7 +95,9 @@ export const runKaruraTask = async () => {
                         "freq": "Daily",
                     })
                 }
-                else console.log("🚨: some other reward");
+                else {
+                    // console.log("🚨: some other reward");
+                }
 
                 // console.log("\tname", reward.rewardToken.display);
                 // console.log("\t\tamount", reward.totalReward.toNumber(), reward.totalReward._getInner().toNumber());
@@ -142,9 +145,9 @@ export const runKaruraTask = async () => {
                 // console.log("dd", dd?.dailyTradeVolumeUSD, parseFloat(dd?.dailyTradeVolumeUSD) / 10 ** 18);
                 dailyTradeVolumeUSDLW += parseFloat(dd?.dailyTradeVolumeUSD) / 10 ** 18;
             });
-            console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
+            // console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
             dailyTradeVolumeUSDLW /= d?.data?.pool?.dayData?.nodes?.length
-            console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
+            // console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
             let baseAPR = (dailyTradeVolumeUSDLW * 0.003 * 365.0 * 100.0
                 / pd?.tvl?.toNumber()) ?? 0.0;
 
@@ -159,20 +162,20 @@ export const runKaruraTask = async () => {
                 "tvl": totalStaked,
                 "rewards": rewards
             })
-            console.log(`pool ${ip.id}`, {
-                "savingRate": ip.savingRate?.toNumber(),
-                "totalShares": ip.totalShares.toNumber(),
-                "collateral.ed": ip.collateral.ed.toNumber(),
-                "id": ip.id,
-                "name": ip.collateral.fullname,
-                "symbol": ip.collateral.display,
-                "apr": {
-                    "reward": (ip.apr?.apr ?? 0.0) * 100.0,
-                    "base": baseAPR,
-                },
-                "tvl": totalStaked,
-                "rewards": rewards
-            });
+            // console.log(`pool ${ip.id}`, {
+            //     "savingRate": ip.savingRate?.toNumber(),
+            //     "totalShares": ip.totalShares.toNumber(),
+            //     "collateral.ed": ip.collateral.ed.toNumber(),
+            //     "id": ip.id,
+            //     "name": ip.collateral.fullname,
+            //     "symbol": ip.collateral.display,
+            //     "apr": {
+            //         "reward": (ip.apr?.apr ?? 0.0) * 100.0,
+            //         "base": baseAPR,
+            //     },
+            //     "tvl": totalStaked,
+            //     "rewards": rewards
+            // });
 
             const token0 = ip.collateral.display.split(" ")[1].split("-")[0]
             const token1 = ip.collateral.display.split(" ")[1].split("-")[1]
@@ -211,10 +214,13 @@ export const runKaruraTask = async () => {
             }, {
                 upsert: true
             }).then(r => {
-                console.log("incentives-dex-dexshare");
+                // console.log("incentives-dex-dexshare");
             }).catch(e => {
                 console.log("error incentives-dex-dexshare", e);
             })
         }
     })
+
+    // provider
+    // api.cl
 }
