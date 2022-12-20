@@ -11,12 +11,12 @@ const main = async () => {
     await runArswTask();
     await runSiriusTask();
     await runMangataTask();
-    await runKaruraTask();
+    // await runKaruraTask();
     setInterval(runNftTask, 1000 * 60 * 60) // every hour
     setInterval(runArswTask, 1000 * 60 * 5) // every 5min
     setInterval(runSiriusTask, 1000 * 60 * 5) // every 5min
     setInterval(runMangataTask, 1000 * 60 * 5) // every 5min
-    setInterval(runKaruraTask, 1000 * 60 * 5) // every 5min
+    // setInterval(runKaruraTask, 1000 * 60 * 5) // every 5min
 }
 
 connectToDatabase().then(() => {
