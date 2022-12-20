@@ -65,7 +65,7 @@ export const runNftTask = async () => {
         let mint_res = await baynft
             .batchGift(
                 users,
-                "Qmax53G4ajDtU3uTWmswUE2C9FVTEPHhdpfeTkQxGr9WK8",
+                "QmV8xQ5WqgZAruKu5hmtUvZcTHzWapHhTXZ73zVkuMMTZn",
             );
 
         console.log("mint_res", mint_res);
