@@ -20,7 +20,7 @@ export const runNftTask = async () => {
     let baynft: any = new ethers.Contract(moonbeam_baynft, abi, wallet as unknown as Signer);
 
     let ucres: any[] = await collections.users?.find({
-        "users_brought": { "$gt": 5 },
+        "users_brought": { "$gt": 4 },
         "owns_nft": false,
     }).toArray() as unknown as any[]
     console.log("ucres", ucres);
