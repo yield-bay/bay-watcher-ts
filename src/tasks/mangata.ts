@@ -179,6 +179,8 @@ export const runMangataTask = async () => {
     const pprs: any = await api.query.issuance.promotedPoolsRewardsV2()
 
     let assetsInfo = await mangata.getAssetsInfo()
+    console.log("assetsInfo", assetsInfo);
+
 
     let weightSum = 0;
     pprs.forEach((ppr: Map<string, number>, q: any) => {
@@ -188,13 +190,16 @@ export const runMangataTask = async () => {
     const balance40: any = await mangata.getAmountOfTokenIdInPool('4', '0')
     const balance07: any = await mangata.getAmountOfTokenIdInPool('0', '7')
     const balance011: any = await mangata.getAmountOfTokenIdInPool('0', '11')
+    const balance014: any = await mangata.getAmountOfTokenIdInPool('0', '14')
+    const balance140: any = await mangata.getAmountOfTokenIdInPool('14', '0')
 
-    let rwd_pools_count = 3
+    console.log("balance014", balance014, "mangata.getPools()", await mangata.getPools(), await mangata.getLiquidityTokenId("14", "0"));
 
     let mgxDecimals: number = assetsInfo[0]['decimals']
     let ksmDecimals: number = assetsInfo[4]['decimals']
     let turDecimals: number = assetsInfo[7]['decimals']
     let imbuDecimals: number = assetsInfo[11]['decimals']
+    let bncDecimals: number = assetsInfo[14]['decimals']
 
     let bal0_4_0 = balance40.toString().split(",")[0]
     let bal1_4_0 = balance40.toString().split(",")[1]
@@ -204,6 +209,9 @@ export const runMangataTask = async () => {
 
     let bal0_0_11 = balance011.toString().split(",")[0]
     let bal1_0_11 = balance011.toString().split(",")[1]
+
+    let bal0_0_14 = balance014.toString().split(",")[0]
+    let bal1_0_14 = balance014.toString().split(",")[1]
 
     const amountPool40 = await mangata.getAmountOfTokenIdInPool("4", "0");
     const ksmReserve40 = amountPool40[0];
@@ -235,6 +243,16 @@ export const runMangataTask = async () => {
         new BN((10 ** imbuDecimals).toString())
     );
 
+    const amountPool014 = await mangata.getAmountOfTokenIdInPool("0", "14");
+    const mgxReserve014 = amountPool014[0];
+    const bncReserve014 = amountPool014[1];
+
+    const bncBuyPriceInMgx = await mangata.calculateBuyPrice(
+        mgxReserve014,
+        bncReserve014,
+        new BN((10 ** bncDecimals).toString())
+    );
+
     const mgxInKsm = mgxBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
     const turInMgx = turBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
@@ -243,18 +261,23 @@ export const runMangataTask = async () => {
     const imbuInMgx = imbuBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
     const imbuInKsm = imbuInMgx * mgxInKsm;
 
+    const bncInMgx = bncBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
+    const bncInKsm = bncInMgx * mgxInKsm;
+
     let cgkres = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kusama&vs_currencies=usd")
     const ksmInUsd = cgkres?.data?.kusama?.usd ?? 0;
 
     const ksmMgxTvl = ksmInUsd * (parseInt(bal0_4_0) / 10 ** ksmDecimals + (mgxInKsm * parseInt(bal1_4_0) / 10 ** mgxDecimals));
     const mgxTurTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_7) / 10 ** mgxDecimals + (turInKsm * parseInt(bal1_0_7) / 10 ** turDecimals));
     const mgxImbuTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_11) / 10 ** mgxDecimals + (imbuInKsm * parseInt(bal1_0_11) / 10 ** imbuDecimals));
+    const mgxBncTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_14) / 10 ** mgxDecimals + (bncInKsm * parseInt(bal1_0_14) / 10 ** bncDecimals));
 
     // base_apr
 
     let baseAPRKsmMgx = 0;
     let baseAPRMgxTur = 0;
     let baseAPRMgxImbu = 0;
+    let baseAPRMgxBnc = 0;
 
     const getDecimals = (assetId: number, assetsInfo: TMainTokens) => {
         return assetsInfo[assetId.toString()].decimals
@@ -381,7 +404,7 @@ export const runMangataTask = async () => {
             let boughtAmount = "0";
             let boughtAmountUsd = 0;
 
-            d3.data.params.forEach((p: Param) => {
+            d3?.data?.params?.forEach((p: Param) => {
                 if (p.name == "sold_asset_id") {
                     soldAsset = p.value
                 } else if (p.name == "sold_asset_amount") {
@@ -409,6 +432,9 @@ export const runMangataTask = async () => {
                 } else if (soldAsset == 11) {
                     // imbu
                     soldAmountUsd = parseInt(sa, 10) * imbuInKsm * ksmInUsd
+                } else if (soldAsset == 14) {
+                    // bnc
+                    soldAmountUsd = parseInt(sa, 10) * bncInKsm * ksmInUsd
                 }
                 return {
                     soldAsset: soldAsset,
@@ -431,6 +457,9 @@ export const runMangataTask = async () => {
                 } else if (boughtAsset == 11) {
                     // imbu
                     boughtAmountUsd = parseInt(ba, 10) * imbuInKsm * ksmInUsd
+                } else if (boughtAsset == 14) {
+                    // bnc
+                    boughtAmountUsd = parseInt(ba, 10) * bncInKsm * ksmInUsd
                 }
                 return {
                     soldAsset: soldAsset,
@@ -451,6 +480,7 @@ export const runMangataTask = async () => {
         let dailyVolumeLWKsmMgx = 0
         let dailyVolumeLWMgxTur = 0
         let dailyVolumeLWMgxImbu = 0
+        let dailyVolumeLWMgxBnc = 0
 
         swaps.forEach((swap) => {
             if (swap !== undefined && typeof swap !== undefined) {
@@ -463,8 +493,12 @@ export const runMangataTask = async () => {
                     dailyVolumeLWMgxTur += swap.amountUsd
                 }
                 if ((swap.boughtAsset == 0 && swap.soldAsset == 11) || (swap.boughtAsset == 11 && swap.soldAsset == 0)) {
-                    // mgx-tur
+                    // mgx-imbu
                     dailyVolumeLWMgxImbu += swap.amountUsd
+                }
+                if ((swap.boughtAsset == 0 && swap.soldAsset == 14) || (swap.boughtAsset == 14 && swap.soldAsset == 0)) {
+                    // mgx-bnc
+                    dailyVolumeLWMgxBnc += swap.amountUsd
                 }
             }
         })
@@ -472,10 +506,12 @@ export const runMangataTask = async () => {
         dailyVolumeLWKsmMgx /= 7
         dailyVolumeLWMgxTur /= 7
         dailyVolumeLWMgxImbu /= 7
+        dailyVolumeLWMgxBnc /= 7
 
         baseAPRKsmMgx = (dailyVolumeLWKsmMgx * 0.002 * 365 * 100) / (ksmMgxTvl)
         baseAPRMgxTur = (dailyVolumeLWMgxTur * 0.002 * 365 * 100) / (mgxTurTvl)
         baseAPRMgxImbu = (dailyVolumeLWMgxImbu * 0.002 * 365 * 100) / (mgxImbuTvl)
+        baseAPRMgxBnc = (dailyVolumeLWMgxBnc * 0.002 * 365 * 100) / (mgxBncTvl)
     }
 
 
@@ -540,6 +576,9 @@ export const runMangataTask = async () => {
         } else if (q?.toString() == "12") {
             tvl = mgxImbuTvl;
             baseApr = baseAPRMgxImbu;
+        } else if (q?.toString() == "17") {
+            tvl = mgxBncTvl;
+            baseApr = baseAPRMgxBnc;
         }
 
         collections.farms?.findOneAndUpdate({
