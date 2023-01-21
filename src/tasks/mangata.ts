@@ -192,6 +192,7 @@ export const runMangataTask = async () => {
     const balance011: any = await mangata.getAmountOfTokenIdInPool('0', '11')
     const balance014: any = await mangata.getAmountOfTokenIdInPool('0', '14')
     const balance140: any = await mangata.getAmountOfTokenIdInPool('14', '0')
+    const balance164: any = await mangata.getAmountOfTokenIdInPool('16', '4')
 
     console.log("balance014", balance014, "mangata.getPools()", await mangata.getPools(), await mangata.getLiquidityTokenId("14", "0"));
 
@@ -200,6 +201,7 @@ export const runMangataTask = async () => {
     let turDecimals: number = assetsInfo[7]['decimals']
     let imbuDecimals: number = assetsInfo[11]['decimals']
     let bncDecimals: number = assetsInfo[14]['decimals']
+    let vsksmDecimals: number = assetsInfo[16]['decimals']
 
     let bal0_4_0 = balance40.toString().split(",")[0]
     let bal1_4_0 = balance40.toString().split(",")[1]
@@ -212,6 +214,9 @@ export const runMangataTask = async () => {
 
     let bal0_0_14 = balance014.toString().split(",")[0]
     let bal1_0_14 = balance014.toString().split(",")[1]
+
+    let bal0_16_4 = balance164.toString().split(",")[0]
+    let bal1_16_4 = balance164.toString().split(",")[1]
 
     const amountPool40 = await mangata.getAmountOfTokenIdInPool("4", "0");
     const ksmReserve40 = amountPool40[0];
@@ -253,6 +258,16 @@ export const runMangataTask = async () => {
         new BN((10 ** bncDecimals).toString())
     );
 
+    const amountPool164 = await mangata.getAmountOfTokenIdInPool("16", "4");
+    const vsksmReserve164 = amountPool164[0];
+    const ksmReserve164 = amountPool164[1];
+
+    const vsksmBuyPriceInKsm = await mangata.calculateBuyPrice(
+        ksmReserve164,
+        vsksmReserve164,
+        new BN((10 ** vsksmDecimals).toString())
+    );
+
     const mgxInKsm = mgxBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
     const turInMgx = turBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
@@ -264,13 +279,19 @@ export const runMangataTask = async () => {
     const bncInMgx = bncBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
     const bncInKsm = bncInMgx * mgxInKsm;
 
+    // const vsksmInMgx = vsksmBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
+    // const vsksmInKsm = vsksmInMgx * mgxInKsm;
+    const vsksmInKsm = vsksmBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
+
     let cgkres = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kusama&vs_currencies=usd")
     const ksmInUsd = cgkres?.data?.kusama?.usd ?? 0;
+    console.log("vsksmInKsm",vsksmInKsm,"vsksminusd",vsksmInKsm*ksmInUsd);
 
     const ksmMgxTvl = ksmInUsd * (parseInt(bal0_4_0) / 10 ** ksmDecimals + (mgxInKsm * parseInt(bal1_4_0) / 10 ** mgxDecimals));
     const mgxTurTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_7) / 10 ** mgxDecimals + (turInKsm * parseInt(bal1_0_7) / 10 ** turDecimals));
     const mgxImbuTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_11) / 10 ** mgxDecimals + (imbuInKsm * parseInt(bal1_0_11) / 10 ** imbuDecimals));
     const mgxBncTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_14) / 10 ** mgxDecimals + (bncInKsm * parseInt(bal1_0_14) / 10 ** bncDecimals));
+    const vsksmKsmTvl = ksmInUsd * (parseInt(bal1_16_4) / 10 ** ksmDecimals + (vsksmInKsm * parseInt(bal0_16_4) / 10 ** vsksmDecimals));
 
     // base_apr
 
@@ -278,241 +299,255 @@ export const runMangataTask = async () => {
     let baseAPRMgxTur = 0;
     let baseAPRMgxImbu = 0;
     let baseAPRMgxBnc = 0;
+    let baseAPRvsksmKsm = 0;
 
     const getDecimals = (assetId: number, assetsInfo: TMainTokens) => {
         return assetsInfo[assetId.toString()].decimals
     }
 
-    // subtract 10 seconds from time to account for possible delay in subscan api
-    const timeNow = Math.floor(Date.now() / 1000) - 10
-    const timeNowLastWeek = Math.floor(Date.now() / 1000) - 10 - (7 * 24 * 60 * 60)
+    // // subtract 10 seconds from time to account for possible delay in subscan api
+    // const timeNow = Math.floor(Date.now() / 1000) - 10
+    // const timeNowLastWeek = Math.floor(Date.now() / 1000) - 10 - (7 * 24 * 60 * 60)
 
-    let blockNow = -1
-    let blockNowLastWeek = -1
+    // let blockNow = -1
+    // let blockNowLastWeek = -1
 
-    const res = await axios({
-        method: 'post',
-        url: 'https://mangatax.webapi.subscan.io/api/scan/block',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
-            'User-Agent': '',
-        },
-        data: JSON.stringify({
-            "block_timestamp": timeNow
-        })
-    })
+    // const res = await axios({
+    //     method: 'post',
+    //     url: 'https://mangatax.webapi.subscan.io/api/scan/block',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
+    //         'User-Agent': '',
+    //     },
+    //     data: JSON.stringify({
+    //         "block_timestamp": timeNow
+    //     })
+    // })
 
-    let d: BlockRoot;
+    // let d: BlockRoot;
 
-    d = JSON.parse(JSON.stringify(res.data))
+    // d = JSON.parse(JSON.stringify(res.data))
 
-    blockNow = d?.data?.block_num ?? -1;
+    // blockNow = d?.data?.block_num ?? -1;
 
-    const res1 = await axios({
-        method: 'post',
-        url: 'https://mangatax.webapi.subscan.io/api/scan/block',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
-            'User-Agent': '',
-        },
-        data: JSON.stringify({
-            "block_timestamp": timeNowLastWeek
-        })
-    })
+    // const res1 = await axios({
+    //     method: 'post',
+    //     url: 'https://mangatax.webapi.subscan.io/api/scan/block',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
+    //         'User-Agent': '',
+    //     },
+    //     data: JSON.stringify({
+    //         "block_timestamp": timeNowLastWeek
+    //     })
+    // })
 
-    let d1: BlockRoot;
+    // let d1: BlockRoot;
 
-    d1 = JSON.parse(JSON.stringify(res1.data))
+    // d1 = JSON.parse(JSON.stringify(res1.data))
 
-    blockNowLastWeek = d1?.data?.block_num ?? -1;
+    // blockNowLastWeek = d1?.data?.block_num ?? -1;
 
-    if (blockNowLastWeek !== -1 && blockNow !== -1) {
-        let events: any = [];
-        const res2 = await axios({
-            method: 'post',
-            url: 'https://mangatax.webapi.subscan.io/api/v2/scan/events',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
-                'User-Agent': '',
-            },
-            data: JSON.stringify({
-                "address": "", "row": 100, "page": 0, "module": "xyk", "event_id": "assetsswapped", "block_range": `${blockNowLastWeek}-${blockNow}`
-            })
-        })
+    // if (blockNowLastWeek !== -1 && blockNow !== -1) {
+    //     let events: any = [];
+    //     const res2 = await axios({
+    //         method: 'post',
+    //         url: 'https://mangatax.webapi.subscan.io/api/v2/scan/events',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
+    //             'User-Agent': '',
+    //         },
+    //         data: JSON.stringify({
+    //             "address": "", "row": 100, "page": 0, "module": "xyk", "event_id": "assetsswapped", "block_range": `${blockNowLastWeek}-${blockNow}`
+    //         })
+    //     })
 
-        let d2: EventsRoot;
+    //     let d2: EventsRoot;
 
-        d2 = JSON.parse(JSON.stringify(res2.data))
+    //     d2 = JSON.parse(JSON.stringify(res2.data))
 
-        let dc = d2?.data?.count;
+    //     let dc = d2?.data?.count;
 
-        events = events.concat(d2?.data?.events)
+    //     events = events.concat(d2?.data?.events)
 
-        if (dc > 100) {
-            let i = Math.floor(dc / 100)
-            for (let idx = 1; idx <= i; idx++) {
-                const resi = await axios({
-                    method: 'post',
-                    url: 'https://mangatax.webapi.subscan.io/api/v2/scan/events',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
-                        'User-Agent': '',
-                    },
-                    data: JSON.stringify({
-                        "address": "", "row": 100, "page": idx, "module": "xyk", "event_id": "assetsswapped", "block_range": `${blockNowLastWeek}-${blockNow}`
-                    })
-                })
+    //     if (dc > 100) {
+    //         let i = Math.floor(dc / 100)
+    //         for (let idx = 1; idx <= i; idx++) {
+    //             const resi = await axios({
+    //                 method: 'post',
+    //                 url: 'https://mangatax.webapi.subscan.io/api/v2/scan/events',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
+    //                     'User-Agent': '',
+    //                 },
+    //                 data: JSON.stringify({
+    //                     "address": "", "row": 100, "page": idx, "module": "xyk", "event_id": "assetsswapped", "block_range": `${blockNowLastWeek}-${blockNow}`
+    //                 })
+    //             })
 
-                let di: EventsRoot;
+    //             let di: EventsRoot;
 
-                di = JSON.parse(JSON.stringify(resi.data))
+    //             di = JSON.parse(JSON.stringify(resi.data))
 
-                events = events.concat(di?.data?.events)
-            }
-        }
+    //             events = events.concat(di?.data?.events)
+    //         }
+    //     }
 
-        let swaps: any[] = []
+    //     let swaps: any[] = []
 
-        let myarr = await Promise.all(events.map(async (ev: Event) => {
-            const res = await axios({
-                method: 'post',
-                url: 'https://mangatax.webapi.subscan.io/api/scan/extrinsic',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
-                    'User-Agent': '',
-                },
-                data: JSON.stringify({
-                    "extrinsic_index": `${ev.extrinsic_index}`,
-                    "events_limit": 10,
-                    "focus": `${ev.extrinsic_index}`
-                })
-            })
+    //     let myarr = await Promise.all(events.map(async (ev: Event) => {
+    //         const res = await axios({
+    //             method: 'post',
+    //             url: 'https://mangatax.webapi.subscan.io/api/scan/extrinsic',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'X-API-Key': `${process.env.SUBSCAN_API_KEY}`,
+    //                 'User-Agent': '',
+    //             },
+    //             data: JSON.stringify({
+    //                 "extrinsic_index": `${ev.extrinsic_index}`,
+    //                 "events_limit": 10,
+    //                 "focus": `${ev.extrinsic_index}`
+    //             })
+    //         })
 
-            let d3: ExtrinsicRoot;
+    //         let d3: ExtrinsicRoot;
 
-            d3 = JSON.parse(JSON.stringify(res.data))
+    //         d3 = JSON.parse(JSON.stringify(res.data))
 
-            let soldAsset = -1;
-            let soldAmount = "0";
-            let soldAmountUsd = 0;
-            let boughtAsset = -1;
-            let boughtAmount = "0";
-            let boughtAmountUsd = 0;
+    //         let soldAsset = -1;
+    //         let soldAmount = "0";
+    //         let soldAmountUsd = 0;
+    //         let boughtAsset = -1;
+    //         let boughtAmount = "0";
+    //         let boughtAmountUsd = 0;
 
-            d3?.data?.params?.forEach((p: Param) => {
-                if (p.name == "sold_asset_id") {
-                    soldAsset = p.value
-                } else if (p.name == "sold_asset_amount") {
-                    soldAmount = p.value;
-                } else if (p.name == "bought_asset_id") {
-                    boughtAsset = p.value
-                } else if (p.name == "bought_asset_amount") {
-                    boughtAmount = p.value;
-                }
-            })
+    //         d3?.data?.params?.forEach((p: Param) => {
+    //             if (p.name == "sold_asset_id") {
+    //                 soldAsset = p.value
+    //             } else if (p.name == "sold_asset_amount") {
+    //                 soldAmount = p.value;
+    //             } else if (p.name == "bought_asset_id") {
+    //                 boughtAsset = p.value
+    //             } else if (p.name == "bought_asset_amount") {
+    //                 boughtAmount = p.value;
+    //             }
+    //         })
 
-            let swapType = "";
+    //         let swapType = "";
 
-            if (soldAsset !== -1) {
-                let sa = (parseInt(soldAmount, 10) / 10 ** getDecimals(soldAsset, assetsInfo), 10).toString()
-                if (soldAsset == 4) {
-                    // ksm
-                    soldAmountUsd = parseInt(sa, 10) * ksmInUsd
-                } else if (soldAsset == 0) {
-                    // mgx
-                    soldAmountUsd = parseInt(sa, 10) * mgxInKsm * ksmInUsd
-                } else if (soldAsset == 7) {
-                    // tur
-                    soldAmountUsd = parseInt(sa, 10) * turInKsm * ksmInUsd
-                } else if (soldAsset == 11) {
-                    // imbu
-                    soldAmountUsd = parseInt(sa, 10) * imbuInKsm * ksmInUsd
-                } else if (soldAsset == 14) {
-                    // bnc
-                    soldAmountUsd = parseInt(sa, 10) * bncInKsm * ksmInUsd
-                }
-                return {
-                    soldAsset: soldAsset,
-                    boughtAsset: boughtAsset,
-                    amount: soldAmount,
-                    amountUsd: soldAmountUsd,
-                    swapType: "sell"
-                }
-            } else if (boughtAsset !== -1) {
-                let ba = (parseInt(boughtAmount, 10) / 10 ** getDecimals(boughtAsset, assetsInfo), 10).toString()
-                if (boughtAsset == 4) {
-                    // ksm
-                    boughtAmountUsd = parseInt(ba, 10) * ksmInUsd
-                } else if (boughtAsset == 0) {
-                    // mgx
-                    boughtAmountUsd = parseInt(ba, 10) * mgxInKsm * ksmInUsd
-                } else if (boughtAsset == 7) {
-                    // tur
-                    boughtAmountUsd = parseInt(ba, 10) * turInKsm * ksmInUsd
-                } else if (boughtAsset == 11) {
-                    // imbu
-                    boughtAmountUsd = parseInt(ba, 10) * imbuInKsm * ksmInUsd
-                } else if (boughtAsset == 14) {
-                    // bnc
-                    boughtAmountUsd = parseInt(ba, 10) * bncInKsm * ksmInUsd
-                }
-                return {
-                    soldAsset: soldAsset,
-                    boughtAsset: boughtAsset,
-                    amount: boughtAmount,
-                    amountUsd: boughtAmountUsd,
-                    swapType: "buy"
-                }
-            }
-        }))
+    //         if (soldAsset !== -1) {
+    //             let sa = (parseInt(soldAmount, 10) / 10 ** getDecimals(soldAsset, assetsInfo), 10).toString()
+    //             if (soldAsset == 4) {
+    //                 // ksm
+    //                 soldAmountUsd = parseInt(sa, 10) * ksmInUsd
+    //             } else if (soldAsset == 0) {
+    //                 // mgx
+    //                 soldAmountUsd = parseInt(sa, 10) * mgxInKsm * ksmInUsd
+    //             } else if (soldAsset == 7) {
+    //                 // tur
+    //                 soldAmountUsd = parseInt(sa, 10) * turInKsm * ksmInUsd
+    //             } else if (soldAsset == 11) {
+    //                 // imbu
+    //                 soldAmountUsd = parseInt(sa, 10) * imbuInKsm * ksmInUsd
+    //             } else if (soldAsset == 14) {
+    //                 // bnc
+    //                 soldAmountUsd = parseInt(sa, 10) * bncInKsm * ksmInUsd
+    //             } else if (soldAsset == 16) {
+    //                 // vsksm
+    //                 soldAmountUsd = parseInt(sa, 10) * vsksmInKsm * ksmInUsd
+    //             }
+    //             return {
+    //                 soldAsset: soldAsset,
+    //                 boughtAsset: boughtAsset,
+    //                 amount: soldAmount,
+    //                 amountUsd: soldAmountUsd,
+    //                 swapType: "sell"
+    //             }
+    //         } else if (boughtAsset !== -1) {
+    //             let ba = (parseInt(boughtAmount, 10) / 10 ** getDecimals(boughtAsset, assetsInfo), 10).toString()
+    //             if (boughtAsset == 4) {
+    //                 // ksm
+    //                 boughtAmountUsd = parseInt(ba, 10) * ksmInUsd
+    //             } else if (boughtAsset == 0) {
+    //                 // mgx
+    //                 boughtAmountUsd = parseInt(ba, 10) * mgxInKsm * ksmInUsd
+    //             } else if (boughtAsset == 7) {
+    //                 // tur
+    //                 boughtAmountUsd = parseInt(ba, 10) * turInKsm * ksmInUsd
+    //             } else if (boughtAsset == 11) {
+    //                 // imbu
+    //                 boughtAmountUsd = parseInt(ba, 10) * imbuInKsm * ksmInUsd
+    //             } else if (boughtAsset == 14) {
+    //                 // bnc
+    //                 boughtAmountUsd = parseInt(ba, 10) * bncInKsm * ksmInUsd
+    //             } else if (boughtAsset == 16) {
+    //                 // vsksm
+    //                 soldAmountUsd = parseInt(ba, 10) * vsksmInKsm * ksmInUsd
+    //             }
+    //             return {
+    //                 soldAsset: soldAsset,
+    //                 boughtAsset: boughtAsset,
+    //                 amount: boughtAmount,
+    //                 amountUsd: boughtAmountUsd,
+    //                 swapType: "buy"
+    //             }
+    //         }
+    //     }))
 
-        if (myarr == undefined || typeof myarr == undefined) {
-            swaps = []
-        } else {
-            swaps = myarr
-        }
+    //     if (myarr == undefined || typeof myarr == undefined) {
+    //         swaps = []
+    //     } else {
+    //         swaps = myarr
+    //     }
 
-        let dailyVolumeLWKsmMgx = 0
-        let dailyVolumeLWMgxTur = 0
-        let dailyVolumeLWMgxImbu = 0
-        let dailyVolumeLWMgxBnc = 0
+    //     let dailyVolumeLWKsmMgx = 0
+    //     let dailyVolumeLWMgxTur = 0
+    //     let dailyVolumeLWMgxImbu = 0
+    //     let dailyVolumeLWMgxBnc = 0
+    //     let dailyVolumeLWvsksmKsm = 0
 
-        swaps.forEach((swap) => {
-            if (swap !== undefined && typeof swap !== undefined) {
-                if ((swap.boughtAsset == 4 && swap.soldAsset == 0) || (swap.boughtAsset == 0 && swap.soldAsset == 4)) {
-                    // ksm-mgx
-                    dailyVolumeLWKsmMgx += swap.amountUsd
-                }
-                if ((swap.boughtAsset == 0 && swap.soldAsset == 7) || (swap.boughtAsset == 7 && swap.soldAsset == 0)) {
-                    // mgx-tur
-                    dailyVolumeLWMgxTur += swap.amountUsd
-                }
-                if ((swap.boughtAsset == 0 && swap.soldAsset == 11) || (swap.boughtAsset == 11 && swap.soldAsset == 0)) {
-                    // mgx-imbu
-                    dailyVolumeLWMgxImbu += swap.amountUsd
-                }
-                if ((swap.boughtAsset == 0 && swap.soldAsset == 14) || (swap.boughtAsset == 14 && swap.soldAsset == 0)) {
-                    // mgx-bnc
-                    dailyVolumeLWMgxBnc += swap.amountUsd
-                }
-            }
-        })
+    //     swaps.forEach((swap) => {
+    //         if (swap !== undefined && typeof swap !== undefined) {
+    //             if ((swap.boughtAsset == 4 && swap.soldAsset == 0) || (swap.boughtAsset == 0 && swap.soldAsset == 4)) {
+    //                 // ksm-mgx
+    //                 dailyVolumeLWKsmMgx += swap.amountUsd
+    //             }
+    //             if ((swap.boughtAsset == 0 && swap.soldAsset == 7) || (swap.boughtAsset == 7 && swap.soldAsset == 0)) {
+    //                 // mgx-tur
+    //                 dailyVolumeLWMgxTur += swap.amountUsd
+    //             }
+    //             if ((swap.boughtAsset == 0 && swap.soldAsset == 11) || (swap.boughtAsset == 11 && swap.soldAsset == 0)) {
+    //                 // mgx-imbu
+    //                 dailyVolumeLWMgxImbu += swap.amountUsd
+    //             }
+    //             if ((swap.boughtAsset == 0 && swap.soldAsset == 14) || (swap.boughtAsset == 14 && swap.soldAsset == 0)) {
+    //                 // mgx-bnc
+    //                 dailyVolumeLWMgxBnc += swap.amountUsd
+    //             }
+    //             if ((swap.boughtAsset == 16 && swap.soldAsset == 4) || (swap.boughtAsset == 4 && swap.soldAsset == 16)) {
+    //                 // vsksm-ksm
+    //                 dailyVolumeLWvsksmKsm += swap.amountUsd
+    //             }
+    //         }
+    //     })
 
-        dailyVolumeLWKsmMgx /= 7
-        dailyVolumeLWMgxTur /= 7
-        dailyVolumeLWMgxImbu /= 7
-        dailyVolumeLWMgxBnc /= 7
+    //     dailyVolumeLWKsmMgx /= 7
+    //     dailyVolumeLWMgxTur /= 7
+    //     dailyVolumeLWMgxImbu /= 7
+    //     dailyVolumeLWMgxBnc /= 7
+    //     dailyVolumeLWvsksmKsm /= 7
 
-        baseAPRKsmMgx = (dailyVolumeLWKsmMgx * 0.002 * 365 * 100) / (ksmMgxTvl)
-        baseAPRMgxTur = (dailyVolumeLWMgxTur * 0.002 * 365 * 100) / (mgxTurTvl)
-        baseAPRMgxImbu = (dailyVolumeLWMgxImbu * 0.002 * 365 * 100) / (mgxImbuTvl)
-        baseAPRMgxBnc = (dailyVolumeLWMgxBnc * 0.002 * 365 * 100) / (mgxBncTvl)
-    }
+    //     baseAPRKsmMgx = (dailyVolumeLWKsmMgx * 0.002 * 365 * 100) / (ksmMgxTvl)
+    //     baseAPRMgxTur = (dailyVolumeLWMgxTur * 0.002 * 365 * 100) / (mgxTurTvl)
+    //     baseAPRMgxImbu = (dailyVolumeLWMgxImbu * 0.002 * 365 * 100) / (mgxImbuTvl)
+    //     baseAPRMgxBnc = (dailyVolumeLWMgxBnc * 0.002 * 365 * 100) / (mgxBncTvl)
+    //     baseAPRvsksmKsm = (dailyVolumeLWvsksmKsm * 0.002 * 365 * 100) / (vsksmKsmTvl)
+    // }
 
 
     pprs.forEach(async (ppr: Map<string, number>, q: any) => {
@@ -579,7 +614,12 @@ export const runMangataTask = async () => {
         } else if (q?.toString() == "17") {
             tvl = mgxBncTvl;
             baseApr = baseAPRMgxBnc;
+        } else if (q?.toString() == "19") {
+            tvl = vsksmKsmTvl;
+            baseApr = baseAPRvsksmKsm;
         }
+        console.log("tvl",tvl,"apr",apr);
+        
 
         collections.farms?.findOneAndUpdate({
             "id": parseInt(q?.toString(), 10),
