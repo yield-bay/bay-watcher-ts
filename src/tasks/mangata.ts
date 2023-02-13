@@ -193,6 +193,7 @@ export const runMangataTask = async () => {
     const balance014: any = await mangata.getAmountOfTokenIdInPool('0', '14')
     const balance140: any = await mangata.getAmountOfTokenIdInPool('14', '0')
     const balance164: any = await mangata.getAmountOfTokenIdInPool('16', '4')
+    const balance154: any = await mangata.getAmountOfTokenIdInPool('15', '4')
 
     console.log("balance014", balance014, "mangata.getPools()", await mangata.getPools(), await mangata.getLiquidityTokenId("14", "0"));
 
@@ -201,6 +202,7 @@ export const runMangataTask = async () => {
     let turDecimals: number = assetsInfo[7]['decimals']
     let imbuDecimals: number = assetsInfo[11]['decimals']
     let bncDecimals: number = assetsInfo[14]['decimals']
+    let vksmDecimals: number = assetsInfo[15]['decimals']
     let vsksmDecimals: number = assetsInfo[16]['decimals']
 
     let bal0_4_0 = balance40.toString().split(",")[0]
@@ -217,6 +219,9 @@ export const runMangataTask = async () => {
 
     let bal0_16_4 = balance164.toString().split(",")[0]
     let bal1_16_4 = balance164.toString().split(",")[1]
+
+    let bal0_15_4 = balance154.toString().split(",")[0]
+    let bal1_15_4 = balance154.toString().split(",")[1]
 
     const amountPool40 = await mangata.getAmountOfTokenIdInPool("4", "0");
     const ksmReserve40 = amountPool40[0];
@@ -268,6 +273,16 @@ export const runMangataTask = async () => {
         new BN((10 ** vsksmDecimals).toString())
     );
 
+    const amountPool154 = await mangata.getAmountOfTokenIdInPool("15", "4");
+    const vksmReserve154 = amountPool154[0];
+    const ksmReserve154 = amountPool154[1];
+
+    const vksmBuyPriceInKsm = await mangata.calculateBuyPrice(
+        ksmReserve154,
+        vksmReserve154,
+        new BN((10 ** vksmDecimals).toString())
+    );
+
     const mgxInKsm = mgxBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
     const turInMgx = turBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
@@ -283,15 +298,19 @@ export const runMangataTask = async () => {
     // const vsksmInKsm = vsksmInMgx * mgxInKsm;
     const vsksmInKsm = vsksmBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
+    const vksmInKsm = vksmBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
+
     let cgkres = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kusama&vs_currencies=usd")
     const ksmInUsd = cgkres?.data?.kusama?.usd ?? 0;
-    console.log("vsksmInKsm",vsksmInKsm,"vsksminusd",vsksmInKsm*ksmInUsd);
+    console.log("vsksmInKsm", vsksmInKsm, "vsksminusd", vsksmInKsm * ksmInUsd);
+    console.log("vksmInKsm", vksmInKsm, "vksmInUsd", vksmInKsm * ksmInUsd);
 
     const ksmMgxTvl = ksmInUsd * (parseInt(bal0_4_0) / 10 ** ksmDecimals + (mgxInKsm * parseInt(bal1_4_0) / 10 ** mgxDecimals));
     const mgxTurTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_7) / 10 ** mgxDecimals + (turInKsm * parseInt(bal1_0_7) / 10 ** turDecimals));
     const mgxImbuTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_11) / 10 ** mgxDecimals + (imbuInKsm * parseInt(bal1_0_11) / 10 ** imbuDecimals));
     const mgxBncTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_14) / 10 ** mgxDecimals + (bncInKsm * parseInt(bal1_0_14) / 10 ** bncDecimals));
     const vsksmKsmTvl = ksmInUsd * (parseInt(bal1_16_4) / 10 ** ksmDecimals + (vsksmInKsm * parseInt(bal0_16_4) / 10 ** vsksmDecimals));
+    const vksmKsmTvl = ksmInUsd * (parseInt(bal1_15_4) / 10 ** ksmDecimals + (vksmInKsm * parseInt(bal0_15_4) / 10 ** vksmDecimals));
 
     // base_apr
 
@@ -300,6 +319,7 @@ export const runMangataTask = async () => {
     let baseAPRMgxImbu = 0;
     let baseAPRMgxBnc = 0;
     let baseAPRvsksmKsm = 0;
+    let baseAPRvksmKsm = 0;
 
     const getDecimals = (assetId: number, assetsInfo: TMainTokens) => {
         return assetsInfo[assetId.toString()].decimals
@@ -617,9 +637,12 @@ export const runMangataTask = async () => {
         } else if (q?.toString() == "19") {
             tvl = vsksmKsmTvl;
             baseApr = baseAPRvsksmKsm;
+        } else if (q?.toString() == "21") {
+            tvl = vksmKsmTvl;
+            baseApr = baseAPRvksmKsm;
         }
-        console.log("tvl",tvl,"apr",apr);
-        
+        console.log("tvl", tvl, "apr", apr);
+
 
         collections.farms?.findOneAndUpdate({
             "id": parseInt(q?.toString(), 10),
