@@ -194,6 +194,8 @@ export const runMangataTask = async () => {
     const balance140: any = await mangata.getAmountOfTokenIdInPool('14', '0')
     const balance164: any = await mangata.getAmountOfTokenIdInPool('16', '4')
     const balance154: any = await mangata.getAmountOfTokenIdInPool('15', '4')
+    const balance260: any = await mangata.getAmountOfTokenIdInPool('26', '0')
+
 
     console.log("balance014", balance014, "mangata.getPools()", await mangata.getPools(), await mangata.getLiquidityTokenId("14", "0"));
 
@@ -204,6 +206,7 @@ export const runMangataTask = async () => {
     let bncDecimals: number = assetsInfo[14]['decimals']
     let vksmDecimals: number = assetsInfo[15]['decimals']
     let vsksmDecimals: number = assetsInfo[16]['decimals']
+    let zlkDecimals: number = assetsInfo[26]['decimals']
 
     let bal0_4_0 = balance40.toString().split(",")[0]
     let bal1_4_0 = balance40.toString().split(",")[1]
@@ -222,6 +225,9 @@ export const runMangataTask = async () => {
 
     let bal0_15_4 = balance154.toString().split(",")[0]
     let bal1_15_4 = balance154.toString().split(",")[1]
+
+    let bal0_26_0 = balance260.toString().split(",")[0]
+    let bal1_26_0 = balance260.toString().split(",")[1]
 
     const amountPool40 = await mangata.getAmountOfTokenIdInPool("4", "0");
     const ksmReserve40 = amountPool40[0];
@@ -283,6 +289,18 @@ export const runMangataTask = async () => {
         new BN((10 ** vksmDecimals).toString())
     );
 
+    const amountPool260 = await mangata.getAmountOfTokenIdInPool("26", "0");
+    const mgxReserve260 = amountPool260[1];
+    const zlkReserve260 = amountPool260[0];
+
+    const zlkBuyPriceInMgx = await mangata.calculateBuyPrice(
+        mgxReserve260,
+        zlkReserve260,
+        new BN((10 ** mgxDecimals).toString())
+    );
+    console.log("zlkBuyPriceInMgx", zlkBuyPriceInMgx);
+
+
     const mgxInKsm = mgxBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
     const turInMgx = turBuyPriceInMgx.div(new BN((10 ** mgxDecimals).toString())).toNumber();
@@ -300,10 +318,14 @@ export const runMangataTask = async () => {
 
     const vksmInKsm = vksmBuyPriceInKsm.toNumber() / 10 ** ksmDecimals;
 
+    const zlkInMgx = zlkBuyPriceInMgx.div(new BN((10 ** zlkDecimals).toString())).toNumber();
+    const zlkInKsm = zlkInMgx * mgxInKsm;
+
     let cgkres = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=kusama&vs_currencies=usd")
     const ksmInUsd = cgkres?.data?.kusama?.usd ?? 0;
     console.log("vsksmInKsm", vsksmInKsm, "vsksminusd", vsksmInKsm * ksmInUsd);
     console.log("vksmInKsm", vksmInKsm, "vksmInUsd", vksmInKsm * ksmInUsd);
+    console.log("zlkInMgx", zlkInMgx, "zlkInKsm", zlkInKsm);
 
     const ksmMgxTvl = ksmInUsd * (parseInt(bal0_4_0) / 10 ** ksmDecimals + (mgxInKsm * parseInt(bal1_4_0) / 10 ** mgxDecimals));
     const mgxTurTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_7) / 10 ** mgxDecimals + (turInKsm * parseInt(bal1_0_7) / 10 ** turDecimals));
@@ -311,6 +333,7 @@ export const runMangataTask = async () => {
     const mgxBncTvl = ksmInUsd * (mgxInKsm * parseInt(bal0_0_14) / 10 ** mgxDecimals + (bncInKsm * parseInt(bal1_0_14) / 10 ** bncDecimals));
     const vsksmKsmTvl = ksmInUsd * (parseInt(bal1_16_4) / 10 ** ksmDecimals + (vsksmInKsm * parseInt(bal0_16_4) / 10 ** vsksmDecimals));
     const vksmKsmTvl = ksmInUsd * (parseInt(bal1_15_4) / 10 ** ksmDecimals + (vksmInKsm * parseInt(bal0_15_4) / 10 ** vksmDecimals));
+    const zlkMgxTvl = ksmInUsd * (mgxInKsm * parseInt(bal1_26_0) / 10 ** mgxDecimals + (zlkInKsm * parseInt(bal0_26_0) / 10 ** zlkDecimals));
 
     // base_apr
 
@@ -320,6 +343,7 @@ export const runMangataTask = async () => {
     let baseAPRMgxBnc = 0;
     let baseAPRvsksmKsm = 0;
     let baseAPRvksmKsm = 0;
+    let baseAPRZlkMgx = 0;
 
     const getDecimals = (assetId: number, assetsInfo: TMainTokens) => {
         return assetsInfo[assetId.toString()].decimals
@@ -640,6 +664,9 @@ export const runMangataTask = async () => {
         } else if (q?.toString() == "21") {
             tvl = vksmKsmTvl;
             baseApr = baseAPRvksmKsm;
+        } else if (q?.toString() == "27") {
+            tvl = zlkMgxTvl;
+            baseApr = baseAPRZlkMgx;
         }
         console.log("tvl", tvl, "apr", apr);
 
