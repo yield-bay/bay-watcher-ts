@@ -4,18 +4,21 @@ import { runMangataTask } from "./tasks/mangata";
 import { runSiriusTask } from "./tasks/sirius";
 import { runArswTask } from "./tasks/arsw";
 import { runTuringTask } from "./tasks/turing";
+import { runKintsugiTask } from "./tasks/kintsugi";
 
 import { runNftTask } from "./tasks/nft";
 
 const main = async () => {
     await runTuringTask();
     await runNftTask();
+    await runKintsugiTask();
     await runArswTask();
     await runSiriusTask();
     await runMangataTask();
     // await runKaruraTask();
     setInterval(runTuringTask, 1000 * 60 * 30)
     setInterval(runNftTask, 1000 * 60 * 60) // every hour
+    setInterval(runKintsugiTask, 1000 * 60 * 5) // every 5min
     setInterval(runArswTask, 1000 * 60 * 5) // every 5min
     setInterval(runSiriusTask, 1000 * 60 * 5) // every 5min
     setInterval(runMangataTask, 1000 * 60 * 5) // every 5min
