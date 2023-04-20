@@ -15,6 +15,7 @@ export const runTuringTask = async () => {
     }).toArray() as unknown as any[]
 
     const events = await aces;
+    console.log("aces", events)
 
     events.forEach(async (e) => {
         console.log("ee", e.userAddress, e.chain, e.taskId);
@@ -24,6 +25,8 @@ export const runTuringTask = async () => {
             e.taskId
         )
         const task: any = acs.toHuman()
+        console.log("acs", acs, task)
+
         const etslen = task?.schedule?.Fixed?.executionTimes?.length
         console.log("etslen", etslen);
 
@@ -31,7 +34,22 @@ export const runTuringTask = async () => {
 
         console.log("lastExecTime", lastExecTime);
         console.log("now", Math.floor(Date.now() / 1000));
-        if (lastExecTime > Math.floor(Date.now() / 1000)) {
+        if ((lastExecTime > Math.floor(Date.now() / 1000)) || task == null) {
+            collections.xcmpTasks?.findOneAndUpdate({
+                "userAddress": e.userAddress,
+                "chain": e.chain,
+                "taskId": e.taskId
+            }, {
+                "$set": {
+                    "status": "FINISHED"
+                }
+            }, {
+                upsert: true
+            }).then(r => {
+                console.log("turing staging");
+            }).catch(e => {
+                console.log("error turing staging", e);
+            })
             collections.autocompoundEvents?.findOneAndUpdate({
                 "userAddress": e.userAddress,
                 "chain": e.chain,
