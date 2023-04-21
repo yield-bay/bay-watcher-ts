@@ -28,13 +28,14 @@ export const runTuringTask = async () => {
         console.log("acs", acs, task)
 
         const etslen = task?.schedule?.Fixed?.executionTimes?.length
-        console.log("etslen", etslen);
+        const executionsLeft = task?.schedule?.Fixed?.executionsLeft
+        console.log("etslen", etslen, "executionsLeft", executionsLeft);
 
         const lastExecTime = parseInt(task?.schedule?.Fixed?.executionTimes[etslen - 1].replaceAll(",", ""), 10)
 
         console.log("lastExecTime", lastExecTime);
         console.log("now", Math.floor(Date.now() / 1000));
-        if ((lastExecTime > Math.floor(Date.now() / 1000)) || task == null) {
+        if ((executionsLeft < etslen && (lastExecTime > Math.floor(Date.now() / 1000))) || task == null) {
             collections.xcmpTasks?.findOneAndUpdate({
                 "userAddress": e.userAddress,
                 "chain": e.chain,
