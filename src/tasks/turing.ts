@@ -25,7 +25,7 @@ export const runTuringTask = async () => {
             e.taskId
         )
         const task: any = acs.toHuman()
-        console.log("acs", acs, task)
+        console.log("acs", acs, "task", task)
 
         const etslen = task?.schedule?.Fixed?.executionTimes?.length
         const executionsLeft = task?.schedule?.Fixed?.executionsLeft
@@ -35,7 +35,9 @@ export const runTuringTask = async () => {
 
         console.log("lastExecTime", lastExecTime);
         console.log("now", Math.floor(Date.now() / 1000));
-        if ((executionsLeft < etslen && (lastExecTime > Math.floor(Date.now() / 1000))) || task == null) {
+        if ((executionsLeft < etslen && (lastExecTime < Math.floor(Date.now() / 1000))) || task == null) {
+            console.log("here it is")
+
             collections.xcmpTasks?.findOneAndUpdate({
                 "userAddress": e.userAddress,
                 "chain": e.chain,
