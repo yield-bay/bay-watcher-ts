@@ -12,6 +12,7 @@ export const runTuringTask = async () => {
     });
     const aces = collections.autocompoundEvents?.find({
         "status": "RUNNING",
+        "chain": "KUSAMA",
     }).toArray() as unknown as any[]
 
     const events = await aces;
