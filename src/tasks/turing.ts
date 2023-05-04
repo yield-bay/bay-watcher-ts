@@ -5,7 +5,7 @@ import { collections } from '../services/database.service';
 
 export const runTuringTask = async () => {
     const api = await ApiPromise.create({
-        provider: new WsProvider("wss://rpc.turing-staging.oak.tech"),
+        provider: new WsProvider("wss://rpc.turing.oak.tech"),
         rpc,
         types,
         runtime,
