@@ -11,18 +11,18 @@ import { runNftTask } from "./tasks/nft";
 const main = async () => {
     await runTuringTask();
     await runNftTask();
+    await runMangataTask();
     await runKintsugiTask();
     await runArswTask();
-    await runMangataTask();
+    await runKaruraTask();
     // await runSiriusTask();
-    // await runKaruraTask();
     setInterval(runTuringTask, 1000 * 60 * 30)
     setInterval(runNftTask, 1000 * 60 * 60) // every hour
+    setInterval(runMangataTask, 1000 * 60 * 5) // every 5min
     setInterval(runKintsugiTask, 1000 * 60 * 5) // every 5min
     setInterval(runArswTask, 1000 * 60 * 5) // every 5min
-    setInterval(runSiriusTask, 1000 * 60 * 5) // every 5min
-    setInterval(runMangataTask, 1000 * 60 * 5) // every 5min
-    // setInterval(runKaruraTask, 1000 * 60 * 5) // every 5min
+    setInterval(runKaruraTask, 1000 * 60 * 5) // every 5min
+    // setInterval(runSiriusTask, 1000 * 60 * 5) // every 5min
 }
 
 connectToDatabase().then(() => {

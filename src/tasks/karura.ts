@@ -28,7 +28,7 @@ export const runKaruraTask = async () => {
     const wallet = new Wallet(api);
     await wallet.isReady;
 
-    let ict = new Incentive(api, wallet)
+    let ict = new Incentive({ api, wallet })
     let liq = new Liquidity(api, wallet)
     let ips = await ict.getAllIncentivePools()
 
