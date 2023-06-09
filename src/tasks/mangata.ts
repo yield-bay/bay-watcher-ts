@@ -171,7 +171,7 @@ export interface Log {
 export const runMangataTask = async () => {
     const MAINNET_1 = 'wss://mangata-x.api.onfinality.io/public-ws'
     const MAINNET_2 = 'wss://prod-kusama-collator-01.mangatafinance.cloud'
-    const mangata = Mangata.getInstance([MAINNET_1, MAINNET_2])
+    const mangata = Mangata.getInstance(["wss://kusama-rpc.mangata.online"])
 
     const api = await mangata.getApi()
     console.log("Connected: ", api.isConnected)
@@ -726,6 +726,7 @@ export const runMangataTask = async () => {
                 "protocol": "Mangata X",
                 "farmType": "StandardAmm",
                 "farmImpl": "Pallet",
+                "router": "",
                 "asset": {
                     "symbol": `${symbol0}-${symbol1} LP`,
                     "address": `${symbol0}-${symbol1} LP`,
@@ -734,6 +735,7 @@ export const runMangataTask = async () => {
                         `https://raw.githubusercontent.com/yield-bay/assets/main/list/${symbol0}.png`,
                         `https://raw.githubusercontent.com/yield-bay/assets/main/list/${symbol1}.png`,
                     ],
+                    "underlyingAssets": [],
                 },
                 "tvl": tvl,
                 "apr.reward": apr,

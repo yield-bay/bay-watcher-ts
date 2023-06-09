@@ -58,6 +58,7 @@ export const runKintsugiTask = async () => {
                 "protocol": "Kintsugi",
                 "farmType": lpt.type == "STANDARD" ? "StandardAmm" : "StableAmm",
                 "farmImpl": "Pallet",
+                "router": "",
                 "asset": {
                     "symbol": `${lpt.lpToken.name.split(" ")[1]} LP`,
                     "address": `${lpt.lpToken.name.split(" ")[1]} LP`,
@@ -66,6 +67,7 @@ export const runKintsugiTask = async () => {
                         `https://raw.githubusercontent.com/yield-bay/assets/main/list/${lpt.lpToken.name.split(" ")[1].split("-")[0]}.png`,
                         `https://raw.githubusercontent.com/yield-bay/assets/main/list/${lpt.lpToken.name.split(" ")[1].split("-")[1]}.png`,
                     ],
+                    "underlyingAssets": [],
                 },
                 "tvl": tvl,
                 "apr.reward": totalApr,

@@ -195,6 +195,7 @@ export const runKaruraTask = async () => {
                     "protocol": "Karura DEX",
                     "farmType": "StandardAmm",
                     "farmImpl": "Pallet",
+                    "router": "",
                     "asset": {
                         "symbol": ip.collateral.display.split(" ").reverse().join(" "),
                         "address": ip.id,
@@ -203,6 +204,7 @@ export const runKaruraTask = async () => {
                             `https://raw.githubusercontent.com/yield-bay/assets/main/list/${token0}.png`,
                             `https://raw.githubusercontent.com/yield-bay/assets/main/list/${token1}.png`,
                         ],
+                        "underlyingAssets": [],
                     },
                     "tvl": totalStaked,
                     "apr.reward": (ip.apr?.apr ?? 0.0) * 100.0,

@@ -34,11 +34,13 @@ export const runSiriusTask = async () => {
                         "protocol": "Sirius",
                         "farmType": farmType,
                         "farmImpl": "Pallet",
+                        "router": "",
                         "asset": {
                             "symbol": pool.symbol,
                             "address": pool.addresses.lpToken,
                             "price": 0.0,
                             "logos": logos,
+                            "underlyingAssets": [],
                         },
                         "tvl": parseFloat(res1.tvl),
                         "apr.reward": (parseFloat(res1.baseApr) ?? 0.0) * 100.0,

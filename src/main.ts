@@ -13,8 +13,8 @@ const main = async () => {
     await runNftTask();
     await runKintsugiTask();
     await runArswTask();
-    await runSiriusTask();
     await runMangataTask();
+    // await runSiriusTask();
     // await runKaruraTask();
     setInterval(runTuringTask, 1000 * 60 * 30)
     setInterval(runNftTask, 1000 * 60 * 60) // every hour

@@ -47,12 +47,20 @@ export const runArswTask = async () => {
             "protocol": "Arthswap",
             "farmType": "SingleStaking",
             "farmImpl": "Solidity",
+            "router": "0xE915D2393a08a00c5A463053edD31bAe2199b9e7",
             "asset": {
                 "symbol": "eARSW",
                 "address": "eARSW",
                 "price": 0.0,
                 "logos": [
                     "https://raw.githubusercontent.com/yield-bay/assets/main/list/ARSW.png",
+                ],
+                "underlyingAssets": [
+                    {
+                        "symbol": "ARSW",
+                        "address": "0xDe2578Edec4669BA7F41c5d5D2386300bcEA4678",
+                        "decimals": 18,
+                    }
                 ],
             },
             "tvl": tvl,
