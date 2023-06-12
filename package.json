@@ -17,7 +17,7 @@
     "@acala-network/api": "^5.1.1",
     "@acala-network/sdk": "^4.1.9-2",
     "@interlay/interbtc-api": "^2.0.3",
-    "@mangata-finance/sdk": "^1.9.0",
+    "@mangata-finance/sdk": "^1.20.1",
     "@oak-network/api-augment": "^1.8.0-rc.4",
     "@oak-network/types": "^1.8.0-rc.4",
     "@polkadot/api": "^10.7.3",
