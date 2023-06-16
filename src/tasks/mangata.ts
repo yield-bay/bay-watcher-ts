@@ -176,7 +176,7 @@ export const runMangataTask = async () => {
     const api = await mangata.getApi()
     console.log("Connected: ", api.isConnected)
 
-    const pprs: any = await api.query.issuance.promotedPoolsRewardsV2()
+    const pprs: any = await api.query.proofOfStake.promotedPoolRewards()
 
     let assetsInfo = await mangata.getAssetsInfo()
     console.log("assetsInfo", assetsInfo);
