@@ -12,17 +12,17 @@ const main = async () => {
     await runTuringTask();
     await runNftTask();
     await runMangataTask();
+    await runSiriusTask();
     await runKintsugiTask();
-    await runArswTask();
     await runKaruraTask();
-    // await runSiriusTask();
-    setInterval(runTuringTask, 1000 * 60 * 30)
+    await runArswTask();
+    setInterval(runTuringTask, 1000 * 60 * 15)
     setInterval(runNftTask, 1000 * 60 * 60) // every hour
-    setInterval(runMangataTask, 1000 * 60 * 5) // every 5min
-    setInterval(runKintsugiTask, 1000 * 60 * 5) // every 5min
-    setInterval(runArswTask, 1000 * 60 * 5) // every 5min
-    setInterval(runKaruraTask, 1000 * 60 * 5) // every 5min
-    // setInterval(runSiriusTask, 1000 * 60 * 5) // every 5min
+    setInterval(runMangataTask, 1000 * 60 * 15) // every 5min
+    setInterval(runSiriusTask, 1000 * 60 * 15) // every 5min
+    setInterval(runKintsugiTask, 1000 * 60 * 15) // every 5min
+    setInterval(runKaruraTask, 1000 * 60 * 15) // every 5min
+    setInterval(runArswTask, 1000 * 60 * 15) // every 5min
 }
 
 connectToDatabase().then(() => {

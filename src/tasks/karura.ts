@@ -148,7 +148,7 @@ export const runKaruraTask = async () => {
             // console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
             dailyTradeVolumeUSDLW /= d?.data?.pool?.dayData?.nodes?.length
             // console.log("dailyTradeVolumeUSDLW", dailyTradeVolumeUSDLW);
-            let baseAPR = (dailyTradeVolumeUSDLW * 0.003 * 365.0 * 100.0
+            const baseAPR = (dailyTradeVolumeUSDLW * 0.003 * 365.0 * 100.0
                 / pd?.tvl?.toNumber()) ?? 0.0;
 
             farms.push({
