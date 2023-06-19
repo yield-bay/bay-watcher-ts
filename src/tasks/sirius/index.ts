@@ -34,7 +34,7 @@ export const runSiriusTask = async () => {
                         "protocol": "Sirius",
                         "farmType": farmType,
                         "farmImpl": "Pallet",
-                        "router": "",
+                        "router": pool.addresses.swap,
                         "asset": {
                             "symbol": pool.symbol,
                             "address": pool.addresses.lpToken,
