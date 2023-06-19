@@ -29,14 +29,14 @@ export const runSiriusTask = async () => {
             })
             collections.farms?.findOneAndUpdate({
                 "id": 1,
-                "chef": "sirius-finance",
+                "chef": pool.addresses.gauge,
                 "chain": "Astar",
                 "protocol": "Sirius",
                 "asset.address": pool.addresses.lpToken
             }, {
                 "$set": {
                     "id": 1,
-                    "chef": "sirius-finance",
+                    "chef": pool.addresses.gauge,
                     "chain": "Astar",
                     "protocol": "Sirius",
                     "farmType": farmType,
