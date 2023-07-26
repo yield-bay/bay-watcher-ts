@@ -1,5 +1,5 @@
 import { pools } from './constants'
-import { fn, getLastThursday, getUpcomingThursday, getSrsPrice } from './utils'
+import { fn, getLastThursday, getUpcomingThursday, getSrsPrice, getNastrWastrPrice } from './utils'
 import { getBaseAprData, getExtraRewards } from './utils/data/farm'
 
 import { collections } from '../../services/database.service';
@@ -7,6 +7,84 @@ import { collections } from '../../services/database.service';
 export const runSiriusTask = async () => {
     const availablePools = pools.filter(i => i?.addresses?.gauge)
     const upcomThu = getUpcomingThursday().unix()
+
+    const srsPrice = await getSrsPrice()
+    const nastrWastrPrice = await getNastrWastrPrice()
+    console.log("siriusprice", srsPrice, "nastrWastrPrice", nastrWastrPrice)
+    collections.assets?.findOneAndUpdate({
+        "address": "0xb4461721d3AD256CD59D207fEfBfE05791Ef8568", // nASTR-WASTR LP
+        "chain": "Astar",
+        "protocol": "Sirius",
+    }, {
+        "$set": {
+            "address": "0xb4461721d3AD256CD59D207fEfBfE05791Ef8568",
+            "chain": "Astar",
+            "protocol": "Sirius",
+            "decimals": 18,
+            "feesAPR": 0,
+            "isLP": true,
+            "lastUpdatedAtUTC": new Date().toUTCString(),
+            "liquidity": 0,
+            "logos": [
+                "https://raw.githubusercontent.com/yield-bay/assets/main/list/WASTR.png",
+                "https://raw.githubusercontent.com/yield-bay/assets/main/list/nASTR.png"
+            ],
+            "name": "nASTR-WASTR LP",
+            "price": nastrWastrPrice,
+            "symbol": "nASTR-WASTR LP",
+            "totalSupply": 0,
+            "underlyingAssets": [
+                {
+                    "symbol": "WASTR",
+                    "address": "0xAeaaf0e2c81Af264101B9129C00F4440cCF0F720",
+                    "decimals": 18
+                },
+                {
+                    "symbol": "nASTR",
+                    "address": "0xE511ED88575C57767BAfb72BfD10775413E3F2b0",
+                    "decimals": 18
+                },
+            ],
+            "underlyingAssetsAlloc": [],
+        }
+    }, {
+        upsert: true
+    }).then(r => {
+        // console.log("sirius-finance", pool.symbol);
+    }).catch(e => {
+        console.log("error sirius-finance", e);
+    })
+    collections.assets?.findOneAndUpdate({
+        "address": "0x9448610696659de8F72e1831d392214aE1ca4838", // SRS
+        "chain": "Astar",
+        "protocol": "Sirius",
+    }, {
+        "$set": {
+            "address": "0x9448610696659de8F72e1831d392214aE1ca4838",
+            "chain": "Astar",
+            "protocol": "Sirius",
+            "decimals": 18,
+            "feesAPR": 0,
+            "isLP": false,
+            "lastUpdatedAtUTC": new Date().toUTCString(),
+            "liquidity": 0,
+            "logos": [
+                "https://raw.githubusercontent.com/yield-bay/assets/main/list/SRS.png",
+            ],
+            "name": "SRS",
+            "price": srsPrice,
+            "symbol": "SRS",
+            "totalSupply": 0,
+            "underlyingAssets": [],
+            "underlyingAssetsAlloc": [],
+        }
+    }, {
+        upsert: true
+    }).then(r => {
+        // console.log("sirius-finance", pool.symbol);
+    }).catch(e => {
+        console.log("error sirius-finance", e);
+    })
 
     const farms = await Promise.all(
         availablePools.map(async pool => {
