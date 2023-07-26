@@ -65,7 +65,7 @@ export const pools = [
       deposit: '0xD18aD1e2992Da974b5A8d69377e6aB3b16e30F29',
       gauge: '0xBbabf2184FbC4DFB17207E74cdB6B1587Dc158a4'
     },
-    coins: [coins.bai, ...stableCoins],
+    coins: [coins.bai, stableSwapCoin],
     type: PoolTypes.USD
   },
   {
@@ -77,7 +77,7 @@ export const pools = [
       deposit: '0x8277d2321CFEF47b508392C08177E05621511234',
       gauge: '0x8dBcd190e325d141E7698f0791792FFBb310A10e'
     },
-    coins: [coins.pusdt, ...stableCoins],
+    coins: [coins.pusdt, stableSwapCoin],
     type: PoolTypes.USD
   },
   {
@@ -89,7 +89,7 @@ export const pools = [
       deposit: '0x3cd1Fa4EeeFdf6c30E66c66A474e8E4dd509f54c',
       gauge: '0xe1762b802Cf306C60b0C2C1af991646eFc8B5C6b'
     },
-    coins: [coins.jpyc, ...stableCoins],
+    coins: [coins.jpyc, stableSwapCoin],
     underlyingCoins: [coins.jpyc, stableSwapCoin],
     type: PoolTypes.Crypto
   },
@@ -102,7 +102,7 @@ export const pools = [
       deposit: '0xD25Cf814EeE54840A08Db8dfAbFE445B1DE37f0f',
       gauge: '0x7f2fbBa3dd14Ef24aFA22E92796791D9a38bFBE0'
     },
-    coins: [coins.wbtc, ...stableCoins],
+    coins: [coins.wbtc, stableSwapCoin],
     underlyingCoins: [coins.wbtc, stableSwapCoin],
     type: PoolTypes.Crypto
   },
@@ -115,7 +115,7 @@ export const pools = [
       deposit: '0x2d5Da7c463B3E8f4CF1AF08a1aA0a5DB9BB644F7',
       gauge: '0x9e56b431AA4Bc8B8D04057977e3606A9110E479f'
     },
-    coins: [coins.weth, ...stableCoins],
+    coins: [coins.weth, stableSwapCoin],
     underlyingCoins: [coins.weth, stableSwapCoin],
     type: PoolTypes.Crypto
   },
@@ -128,7 +128,7 @@ export const pools = [
       deposit: '0xC9d4f937Fa8e0193b46817a41435a262867ff090',
       gauge: '0x941e9BEF5b558D7Ca97aBC98e0664E804A9C4B7b'
     },
-    coins: [coins.wbnb, ...stableCoins],
+    coins: [coins.wbnb, stableSwapCoin],
     underlyingCoins: [coins.wbnb, stableSwapCoin],
     type: PoolTypes.Crypto
   },
@@ -141,7 +141,7 @@ export const pools = [
       deposit: '0x535406b90E8Df2Cf2168E8579ea3d1D7A0e0AdDC',
       gauge: '0x5FF4735274b0C7ADf7de52768645aA08AE4bcB20'
     },
-    coins: [coins.ousd, ...stableCoins],
+    coins: [coins.ousd, stableSwapCoin],
     underlyingCoins: [coins.ousd, stableSwapCoin],
     type: PoolTypes.USD
   }
