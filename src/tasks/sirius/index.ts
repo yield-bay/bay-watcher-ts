@@ -13,10 +13,10 @@ export const runSiriusTask = async () => {
             console.log("sp", pool.name, pool.addresses.swap)
             const [res1, res2, res3] = await Promise.all([getBaseAprData(pool.name, getLastThursday().unix()), getBaseAprData(pool.name, upcomThu), getExtraRewards(pool.name)])
             // if (parseFloat(res1.baseApr) !== 0) {
-            let farmType = 'StableAmm';
-            if (pool.symbol == 'nASTR-ASTR LP') {
-                farmType = 'StandardAmm';
-            }
+            const farmType = 'StableAmm';
+            // if (pool.symbol == 'nASTR-ASTR LP') {
+            //     farmType = 'StandardAmm';
+            // }
             let logos: string[] = []
             let underlyingAssets: any[] = []
             pool.coins.forEach((c: any) => {
