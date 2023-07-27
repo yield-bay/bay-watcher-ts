@@ -99,8 +99,10 @@ export const runSiriusTask = async () => {
             // }
             let logos: string[] = []
             let underlyingAssets: any[] = []
-            pool.coins.forEach((c: any) => {
+            pool.ls?.forEach((c: any) => {
                 logos.push(`https://raw.githubusercontent.com/yield-bay/assets/main/list/${c.symbol}.png`)
+            })
+            pool.coins.forEach((c: any) => {
                 underlyingAssets.push({
                     symbol: c.symbol,
                     address: c.address,

@@ -32,6 +32,7 @@ export const pools = [
       gauge: '0xa6B91ddDca40137B9442b4aD7076bF319eacC59E'
     },
     coins: stableCoins,
+    ls: stableCoins,
     type: PoolTypes.USD
   },
   {
@@ -43,6 +44,7 @@ export const pools = [
       gauge: '0xCfd15008Df89D961611071BfC36e220204E9A3a8'
     },
     coins: stableCoins,
+    ls: stableCoins,
     type: PoolTypes.USD
   },
   {
@@ -54,6 +56,7 @@ export const pools = [
       gauge: '0xdCfFa5a92ef31DCc8979Ab44A0406859d7763c45'
     },
     coins: [coins.astr, coins.nastr],
+    ls: [coins.astr, coins.nastr],
     type: PoolTypes.USD
   },
   {
@@ -66,6 +69,7 @@ export const pools = [
       gauge: '0xBbabf2184FbC4DFB17207E74cdB6B1587Dc158a4'
     },
     coins: [coins.bai, stableSwapCoin],
+    ls: [coins.bai, ...stableCoins],
     type: PoolTypes.USD
   },
   {
@@ -78,6 +82,7 @@ export const pools = [
       gauge: '0x8dBcd190e325d141E7698f0791792FFBb310A10e'
     },
     coins: [coins.pusdt, stableSwapCoin],
+    ls: [coins.pusdt, ...stableCoins],
     type: PoolTypes.USD
   },
   {
@@ -91,6 +96,7 @@ export const pools = [
     },
     coins: [coins.jpyc, stableSwapCoin],
     underlyingCoins: [coins.jpyc, stableSwapCoin],
+    ls: [coins.jpyc, ...stableCoins],
     type: PoolTypes.Crypto
   },
   {
@@ -104,6 +110,7 @@ export const pools = [
     },
     coins: [coins.wbtc, stableSwapCoin],
     underlyingCoins: [coins.wbtc, stableSwapCoin],
+    ls: [coins.wbtc, ...stableCoins],
     type: PoolTypes.Crypto
   },
   {
@@ -117,6 +124,7 @@ export const pools = [
     },
     coins: [coins.weth, stableSwapCoin],
     underlyingCoins: [coins.weth, stableSwapCoin],
+    ls: [coins.weth, ...stableCoins],
     type: PoolTypes.Crypto
   },
   {
@@ -130,6 +138,7 @@ export const pools = [
     },
     coins: [coins.wbnb, stableSwapCoin],
     underlyingCoins: [coins.wbnb, stableSwapCoin],
+    ls: [coins.wbnb, ...stableCoins],
     type: PoolTypes.Crypto
   },
   {
@@ -143,6 +152,7 @@ export const pools = [
     },
     coins: [coins.ousd, stableSwapCoin],
     underlyingCoins: [coins.ousd, stableSwapCoin],
+    ls: [coins.ousd, ...stableCoins],
     type: PoolTypes.USD
   }
 ]
