@@ -79,7 +79,7 @@ export const getSrsPrice = memoize(
   async () => {
     const url = 'https://api.dexscreener.com/latest/dex/pairs/astar/0xde2edaa0cd4afd59d9618c31a060eab93ce45e01'
     const res: any = await (await fetch(url)).json()
-    return +res?.pair?.priceUsd || 0
+    return res?.pair?.priceUsd || 0
   },
   { promise: true, maxAge: 5e3 } // 5 seconds
 )
@@ -88,7 +88,7 @@ export const getNastrWastrPrice = memoize(
   async () => {
     const url = 'https://api.dexscreener.com/latest/dex/pairs/astar/0xb4461721d3ad256cd59d207fefbfe05791ef8568'
     const res: any = await (await fetch(url)).json()
-    return +res?.pair?.priceUsd || 0
+    return res?.pair?.priceUsd || 0
   },
   { promise: true, maxAge: 5e3 } // 5 seconds
 )
