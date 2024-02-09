@@ -13,7 +13,7 @@ const main = async () => {
     await runTuringTask();
     await runNftTask();
     await runMangataTask();
-    await runSiriusTask();
+    // await runSiriusTask();
     await runInterlayTask();
     await runKintsugiTask();
     await runKaruraTask();
@@ -21,7 +21,7 @@ const main = async () => {
     setInterval(runTuringTask, 1000 * 60 * 15)
     setInterval(runNftTask, 1000 * 60 * 60) // every hour
     setInterval(runMangataTask, 1000 * 60 * 15) // every 5min
-    setInterval(runSiriusTask, 1000 * 60 * 15) // every 5min
+    // setInterval(runSiriusTask, 1000 * 60 * 15) // every 5min
     setInterval(runInterlayTask, 1000 * 60 * 15) // every 5min
     setInterval(runKintsugiTask, 1000 * 60 * 15) // every 5min
     setInterval(runKaruraTask, 1000 * 60 * 15) // every 5min
